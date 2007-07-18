@@ -52,8 +52,12 @@ public partial class PageView : BasePage
             }
             ToggleEditor(false);
         } else {
-            SetupNewPage();
-            this.Title = "Create a New Page";
+            if (SiteUtility.UserCanEdit()) {
+                SetupNewPage();
+                this.Title = "Create a New Page";
+            } else {
+                Response.Redirect("~/login.aspx");
+            }
         }
 
     }
