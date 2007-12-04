@@ -35,7 +35,7 @@ namespace CMS {
             //take the page URL, which should be something like "this-is-the-page-name.aspx"
             //and query on it
             Page p = new Page("pageUrl", pageUrl);
-            if (!p.IsLoaded) {
+            if (!p.IsLoaded || p.Deleted) {
                 throw new Exception("There is no page corresponding to " + pageUrl);
             }
 
@@ -52,7 +52,7 @@ namespace CMS {
             //take the page URL, which should be something like "this-is-the-page-name.aspx"
             //and query on it
             Page p = new Page(pageID);
-            if (!p.IsLoaded) {
+			if (!p.IsLoaded || p.Deleted) {
                 throw new Exception("There is no page corresponding to " + pageID.ToString());
             }
 
