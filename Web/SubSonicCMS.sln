@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Web Developer Express 2005
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\SubSonicCMS\", "..\SubSonicCMS\", "{1E527292-25D4-440D-BCCF-AF30B466091E}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.VirtualPath = "/SubSonicCMS"
+		Debug.AspNetCompiler.PhysicalPath = "..\SubSonicCMS\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\SubSonicCMS\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/SubSonicCMS"
+		Release.AspNetCompiler.PhysicalPath = "..\SubSonicCMS\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\SubSonicCMS\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "50958"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E527292-25D4-440D-BCCF-AF30B466091E}.Debug|.NET.ActiveCfg = Debug|.NET
+		{1E527292-25D4-440D-BCCF-AF30B466091E}.Debug|.NET.Build.0 = Debug|.NET
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
