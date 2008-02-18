@@ -17,6 +17,11 @@ public partial class PageView : BasePage
     protected void Page_Init(object sender, EventArgs e) {
         Body.SkinPath = "skins/office2003/";
         Session["FCKeditor:UserFilesPath"] = Page.ResolveUrl("~/CMSFiles");
+		// Disable viewstate for all edit controls since
+		// these won't be used when not editing
+		// thanks tom.brune! http://forums.subsonicproject.com/forums/t/2257.aspx
+		foreach (Control control in pnlEdit.Controls)
+			control.EnableViewState = SiteUtility.UserCanEdit();
 
     }
     protected void Page_Load(object sender, EventArgs e)
