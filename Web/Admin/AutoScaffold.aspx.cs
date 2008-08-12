@@ -7,7 +7,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using SubSonic;
-using SubSonic.Controls;
 using SubSonic.Utilities;
 
 public partial class AutoScaffold : BasePage

@@ -5,60 +5,98 @@
 <head id="Head1" runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <link id="Link1" rel="stylesheet" type="text/css" href='~/js/modal/subModal.css' runat="server" />
-    <meta name="description" content="Description here" />
-    <meta name="keywords" content="Keywords here"  />
     <title></title>
+    <link runat="server" rel="stylesheet" href="~/CSS/Import.css" type="text/css" id="AdaptersInvariantImportCSS" />
+	<!--[if lt IE 7]>
+		<link runat="server" rel="stylesheet" href="~/CSS/BrowserSpecific/IEMenu6.css" type="text/css" id="IEMenu6CSS" />
+	<![endif]--> 
  </head>
 <body>
 <script src="<%=Page.ResolveUrl("~/js/effects/prototype.js") %>" type="text/javascript"></script>
 <script src="<%=Page.ResolveUrl("~/js/effects/scriptaculous.js") %>" type="text/javascript"></script>
+<script src="<%=Page.ResolveUrl("~/js/gridsort/gridSort.js") %>" type="text/javascript"></script>
+
 
 <form id="elForm" runat="server">
+<ajax:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server" CombineScripts="false"></ajax:ToolkitScriptManager>
 	<div id="header">
-        <div id=title><a href='<%=Page.ResolveUrl("~/default.aspx") %>'>
-            <img src='<%=Page.ResolveUrl("~/images/subsonic_logo.png") %>' /> </a></div>
+		<div id="mainwrapper">
+			<div id="headerseparator"></div>
+		</div>
 	</div>
-    
-    <div id=mainwrapper>
-    <div id=headerseparator></div>
-    <div style="height:20px; margin-left:100px;margin-top:5px;">
-        <asp:Menu runat=server ID=siteMenu  Orientation="Horizontal" DataSourceID="SiteMapDataSource1" StaticDisplayLevels=2 >
-            <StaticMenuItemStyle BackColor="Transparent" Font-Size="9pt" HorizontalPadding="0px" ItemSpacing="10px" />
-            <DynamicMenuStyle BorderColor="#E0E0E0" BorderStyle="Solid" BorderWidth="1px" HorizontalPadding="20px" />
-            <DynamicMenuItemStyle BackColor="Transparent" BorderColor="Transparent" Font-Size="9pt"
-                ForeColor="#404040" ItemSpacing="5px" />
-            <StaticSelectedStyle BackColor="Transparent" />
-        </asp:Menu>
-
-        <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" />
-
-
-    </div>
-       <div id=main>
-            <asp:contentplaceholder  id="ContentPlaceHolder1" runat="server">
-            </asp:contentplaceholder>
-       </div>
-    </div>
-    <div style="position:absolute;top:5px;right:10px;color:white">
-        
-        <asp:LoginView ID=elLog runat=server>
-            <AnonymousTemplate>
-            <a href='<%=Page.ResolveUrl("~/login.aspx")%>' class=headlinks>Login</a> | 
-            <a href='<%=Page.ResolveUrl("~/register.aspx")%>' class=headlinks>Register</a>
-           </AnonymousTemplate>
-            <LoggedInTemplate>
-             <span class=headlinks>Welcome Back <%=Page.User.Identity.Name%>!</span> | <asp:LinkButton ID=lnkLogout runat=server OnClick="lnkLogout_Click1" CssClass="headlinks" CausesValidation=false>Logout</asp:LinkButton>
-            </LoggedInTemplate>
-        </asp:LoginView>
-    
-    </div>
-    <!--#INCLUDE File=js/modal/modal_divs.aspx-->
-
-</form>    
-<div id=footer>
-        &copy;<%=DateTime.Now.Year.ToString() %> BigWonderfulIdea.com. Use of this site is subject to our <a href=# target=_blank>Terms of Use</a>. All rights reserved.<br />
-        Duplication of this site, in part or in whole, is prohibited without prior written consent.
-    </div>
+	<!--#INCLUDE File=js/modal/modal_divs.aspx-->
+	<div id="main">
+	<!-- Float this first, so that it appears within the header bar-->
+		<div id="loginview">
+			<asp:LoginView ID="elLog" runat="server">
+				<AnonymousTemplate>
+				<a href='<%=Page.ResolveUrl("~/login.aspx")%>' class="headlinks">Login</a> 
+			   </AnonymousTemplate>
+				<LoggedInTemplate>
+				 <span class="headlinks">Welcome Back <%= Page.User.Identity.Name.ToString() %>!</span> | <asp:LinkButton ID="lnkLogout" runat="server" OnClick="lnkLogout_Click1" CssClass="headlinks" CausesValidation="false">Logout</asp:LinkButton>
+				</LoggedInTemplate>
+			</asp:LoginView>
+		</div>
+		<div id="title">
+			<a href='<%=Page.ResolveUrl("~/default.aspx") %>'>
+			<img alt="logo" src='<%=Page.ResolveUrl("~/images/logo.png") %>' /> </a>
+		</div>
+        <div id="mainmenu">
+            <div id="searchbox">
+	            <asp:Panel ID="pnlSearchBox" runat="server" DefaultButton="btnSiteSearch">
+		            <asp:TextBox ID="txtSiteSearch" runat="server" MaxLength="100" TextMode="SingleLine" ValidationGroup="siteSearchValidation" CausesValidation="true" Width="150px" Visible="false"></asp:TextBox>
+		            <ajax:TextBoxWatermarkExtender ID="txtweSiteSearch" runat="server" TargetControlID="txtSiteSearch" WatermarkText="Search" WatermarkCssClass="watermarktext"></ajax:TextBoxWatermarkExtender>
+<%--					<ajax:AutoCompleteExtender ID="aceSiteSearch" runat="server" TargetControlID="txtSiteSearch" ServiceMethod="GetSearchCompletionList" ServicePath="entities.asmx" MinimumPrefixLength="1" ></ajax:AutoCompleteExtender>
+--%>					<asp:Button ID="btnSiteSearch" runat="server" Text="Go!" CssClass="btnSearch" CausesValidation="true" ValidationGroup="siteSearchValidation" Width="45px" OnClick="btnSiteSearch_Click" Visible="false"/>
+	            </asp:Panel>
+            </div>
+            <asp:Menu runat="server" ID="siteMenu" DataSourceID="SiteMapDataSource1" StaticDisplayLevels="2" Orientation="Horizontal" CssSelectorClass="PrettyMenu" Visible="false">
+            </asp:Menu>
+            <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" ShowStartingNode="false" />
+        </div>
+		
+		<asp:Panel ID="PNL_PageHeader" runat="server" Visible="true" CssClass="pageheader">
+			<div>
+				<asp:contentplaceholder  id="cphMessageBar" runat="server">
+				</asp:contentplaceholder>
+				<div>
+					<div class="pageheader">
+						<h1 class="pagetitle"><%=Title %></h1>
+					</div>
+					<asp:contentplaceholder id="cphTopNav" runat="server" />
+					<asp:Panel ID="pnlEditBar" runat="server" CssClass="pagenavtop">
+						<table>
+							<tr>
+								<td id="tdPageEdit" runat="server"><asp:ImageButton ID="lnkEdit" runat="server" OnClick="lnkEdit_Click" CausesValidation="false" ImageUrl="~/images/icons/edit.gif"/>&nbsp;Edit&nbsp;</td>
+								<td id="tdPageNew" runat="server"><asp:ImageButton ID="lnkNewPage" runat="server" OnClick="lnkNewPage_Click" CausesValidation="false" ImageUrl="~/images/icons/add.gif" />&nbsp;New&nbsp;</td>
+								<td id="tdPageList" runat="server"><asp:ImageButton ID="lnkPageList" runat="server" OnClick="lnkPageList_Click" CausesValidation="false" ImageURL="~/images/icons/addressbook.gif"/>&nbsp;Page List&nbsp;</td>
+							</tr>
+						</table>
+					</asp:Panel>
+					<div class="pagesummary"><%=Summary %>
+						<div id="SiteMapPathWrapper">
+						<asp:SiteMapPath ID="SiteMapPath1" runat="server" Visible="false"></asp:SiteMapPath>
+						</div>
+					</div>
+				</div>
+				<div class="pagebody"><%=Body %></div>
+			</div>
+		</asp:Panel>
+		<div style="float:left;clear:left;">
+			<asp:contentplaceholder  id="cphBody" runat="server">
+			</asp:contentplaceholder>
+		</div>
+		<br />
+		<div style="float:right;clear:left;">
+			<asp:contentplaceholder  id="cphBottomNav" runat="server">
+			</asp:contentplaceholder>
+		</div>
+		<div id="footer">
+			&copy;<%=DateTime.Now.Year.ToString() %> Zions Bank. All rights reserved.<br />
+			Duplication of this site, in part or in whole, is prohibited without prior written consent.<br />
+		</div>
+	</div>
+</form>
 </body>
 </html>
 

@@ -1,5 +1,5 @@
 <%@ Page Language="C#" MasterPageFile="~/site.master" AutoEventWireup="true" CodeFile="PasswordRecover.aspx.cs" Inherits="PasswordRecover" Title="Recover Password" %>
-<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<asp:Content ID="Content1" ContentPlaceHolderID="cphBody" Runat="Server">
 <div id="leftcontent"></div>
 <div id="centercontent">
    <h4>

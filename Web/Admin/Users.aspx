@@ -1,5 +1,8 @@
-<%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="~/site.master" CodeFile="Users.aspx.cs" Inherits="Admin_admin_users" Title="User Administration" Trace="false" %>
-<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="~/site.master" CodeFile="Users.aspx.cs" Inherits="admin_users" Title="User Administration" Trace="false" %>
+<%@ MasterType virtualpath="~/site.master" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="cphBody" Runat="Server">
+<cms:ResultMessage ID="ResultMessage1" runat="server" />
 
 <div id="centercontent">
 <br />
@@ -19,8 +22,10 @@
                     <asp:listItem text="Username" />
                     <asp:listitem text="Email" />
                 </asp:dropDownList>&nbsp;&nbsp;
-                <asp:textbox runat="server" id="TextBox1" BorderStyle="Solid"/>
-                <asp:button ID="Button1" runat="server" text="Search for Users" onclick="SearchForUsers" CssClass="frmbutton"/>
+                <asp:textbox runat="server" id="TextBox1" BorderStyle="Solid" MaxLength="50" ValidationGroup="usersearch"/>
+                <asp:button ID="Button1" runat="server" text="Go" onclick="SearchForUsers" CssClass="btnSearch" ValidationGroup="usersearch"/>
+                <asp:RequiredFieldValidator ID="TextBox1RequiredFieldValidator" runat="server" ControlToValidate="TextBox1" Display="Dynamic" EnableClientScript="true" ValidationGroup="usersearch">required</asp:RequiredFieldValidator>
+                <asp:RegularExpressionValidator ID="rxvTextBox1" runat="server" ControlToValidate="TextBox1" ValidationGroup="usersearch" Display="Dynamic" Text="Search strings must be at least two characters in length, and contain a combination of numbers, letters, and other characters typically found in email addresses such as -, ., or @." ></asp:RegularExpressionValidator>
                 <br/>
             </td>
         </tr>
@@ -28,10 +33,10 @@
 
     <br />
 
-    <asp:GridView ID="GridView1" runat="server" SkinID=subsonicSkin 
+    <asp:GridView ID="GridView1" runat="server" SkinID="subsonicSkin"
         AutoGenerateColumns="False" 
         DataSourceID="allUsersDataSource" 
-        EmptyDataText="There are no matching users in the system." 
+        EmptyDataText="There are no matching users in the system. <br /><br />Try using wildcard characters like  %, ?, *, or _ to improve your search results. For example, searching for Username 'z*' (without the quotes) returns all Usernames that start with z." 
         Font-Italic="False" >
         <Columns>
             <asp:templatefield headertext="Active" ItemStyle-Width="40" ItemStyle-HorizontalAlign="Center">
@@ -39,6 +44,13 @@
                 <itemstyle horizontalalign="center"/>
                 <itemtemplate>
                     <asp:checkBox runat="server" id="CheckBox1" oncheckedchanged="EnabledChanged" autopostback="true" checked='<%#DataBinder.Eval(Container.DataItem, "IsApproved")%>' Value='<%#DataBinder.Eval(Container.DataItem, "UserName")%>'/>
+                </itemtemplate>
+            </asp:templatefield>
+            <asp:templatefield headertext="Locked" ItemStyle-Width="40" ItemStyle-HorizontalAlign="Center">
+                <headerstyle horizontalalign="center"/>
+                <itemstyle horizontalalign="center"/>
+                <itemtemplate>
+                    <asp:checkBox runat="server" id="CheckBox2" Enabled="false" checked='<%#DataBinder.Eval(Container.DataItem, "IsLockedOut")%>' Value='<%#DataBinder.Eval(Container.DataItem, "UserName")%>'/>
                 </itemtemplate>
             </asp:templatefield>
             <asp:templatefield runat="server" headertext="User Name" ItemStyle-Width="160" >
@@ -55,7 +67,7 @@
             <asp:BoundField DataField="LastLoginDate" HeaderText="Last Login" SortExpression="LastLoginDate" ItemStyle-HorizontalAlign="Center"/>
             <asp:templatefield runat="server" ItemStyle-HorizontalAlign="Center">
                 <itemtemplate>
-                    <asp:linkButton runat="server" id="linkButton2" text="Delete" commandname="delete" commandargument='<%#DataBinder.Eval(Container.DataItem, "UserName")%>' forecolor="black" oncommand="LinkButtonClick"/>
+                    <asp:linkButton runat="server" id="linkButton2" text="Delete" commandname="deletetheuser" commandargument='<%#DataBinder.Eval(Container.DataItem, "UserName")%>' forecolor="black" oncommand="LinkButtonClick"/>
                 </itemtemplate>
             </asp:templatefield>
         </Columns>

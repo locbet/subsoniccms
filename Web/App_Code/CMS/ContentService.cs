@@ -52,7 +52,8 @@ namespace CMS {
             //take the page URL, which should be something like "this-is-the-page-name.aspx"
             //and query on it
             Page p = new Page(pageID);
-			if (!p.IsLoaded || p.Deleted) {
+			if (!p.IsLoaded || p.Deleted)
+			{
                 throw new Exception("There is no page corresponding to " + pageID.ToString());
             }
 
@@ -122,17 +123,34 @@ namespace CMS {
             if (p.PageID==0) {
                 //this is an insert
                 p.PageGuid = System.Guid.NewGuid();
+				switch (p.PageTypeID)
+				{
+					case -1:
+					case 1:
+						//leave the PageUrl as-is
+						break;
+					default:
+						//configure the URL from the title
+						p.PageUrl = TransformTitleToUrl(p.Title);
+						break;
+				}
                 
-                //configure the URL from the title
-                p.PageUrl = TransformTitleToUrl(p.Title);
-
                 //gotta make sure the URL's not already in there
                 //the SiteMapProvider doesn't like it
                 CMS.Page pCheck = new Page("PageURL", p.PageUrl);
                 int existingUrls = new SubSonic.Query(Page.Schema).WHERE(Page.Columns.PageUrl, p.PageUrl).GetRecordCount();
-                if (existingUrls>0) {
-                    existingUrls++;
-                    p.PageUrl = p.PageUrl.Replace(".aspx", "_" + existingUrls.ToString() + ".aspx");
+                if (existingUrls>0) 
+				{
+
+					switch (p.PageTypeID)
+					{
+						case 1:
+							throw new Exception("A page with this URL already exists, and the new URL cannot be dynamically changed.");
+						default:
+							existingUrls++;
+							p.PageUrl = p.PageUrl.Replace(".aspx", "_" + existingUrls.ToString() + ".aspx");
+							break;
+					}
                 }
             }
 
