@@ -8,15 +8,25 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using System.Web.Profile;
 
 public partial class admin_user_edit : BasePage
 {
-    bool isEditMode = true;
+    //private CMS.Page _thisPage;
+	bool isEditMode = true;
     string userName = HttpContext.Current.Request["username"];
+	bool allowed = true;
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        // Is in add mode?
+
+        //if (!Page.IsPostBack)
+        //{
+        //    _thisPage = new CMS.Page();
+        //    SiteUtility.BuildBasePage((BasePage)this, ref _thisPage, "Admin/Users_edit.aspx");
+        //    Master.thisPage = _thisPage;
+        //}
+		// Is in add mode?
         //
         if (string.IsNullOrEmpty(userName))
         {
@@ -46,34 +56,13 @@ public partial class admin_user_edit : BasePage
         if (!IsPostBack)
         {
             PopulateCheckboxes();
-
             // Is it in edit mode?
             //
             if (isEditMode)
             {
-                UserID.Text = userName;
-                UserID.Enabled = false;
-
-                MembershipUser mu = Membership.GetUser(userName);
-                if (mu == null)
-                {
-                    return; // Review: scenarios where this happens.
-                }
-
-                Email.Text = mu.Email;
-                ActiveUser.Checked = mu.IsApproved;
-
-                if (Membership.EnablePasswordRetrieval)
-                {
-                    // Load old password
-                    Password.Text = mu.GetPassword();
-                    Password.Enabled = false;
-
-                    // Load old secret question
-                    SecretQuestion.Text = mu.PasswordQuestion;
-                }
-				unlockUser.Enabled = mu.IsLockedOut; 
-            }
+				LoadUserData();
+				LoadProfileData();
+			}
         }
     }
 
@@ -95,6 +84,47 @@ public partial class admin_user_edit : BasePage
         }
     }
 
+	private void LoadUserData()
+	{
+		UserID.Text = userName;
+		UserID.Enabled = false;
+
+		MembershipUser mu = Membership.GetUser(userName);
+		if (mu == null)
+		{
+			return; // Review: scenarios where this happens.
+		}
+
+		Email.Text = mu.Email;
+		ActiveUser.Checked = mu.IsApproved;
+		ActiveUser.Attributes.Add("value", userName);
+
+		if (Membership.EnablePasswordRetrieval)
+		{
+			// Load old password
+			Password.Text = mu.GetPassword();
+			Password.Enabled = false;
+
+			// Load old secret question
+			SecretQuestion.Text = mu.PasswordQuestion;
+		}
+		unlockUser.Enabled = mu.IsLockedOut;
+
+	}
+
+	private void LoadProfileData()
+	{
+		//set any additional profile values here
+		ProfileBase p = ProfileBase.Create(userName);
+		if (p == null)
+		{
+			return;
+		}
+		FirstName.Text = p.GetPropertyValue("FirstName").ToString();
+		LastName.Text = p.GetPropertyValue("LastName").ToString();
+		CommonName.Text = p.GetPropertyValue("CommonName").ToString();
+	}
+
     public void SaveClick(object sender, EventArgs e)
     {
         if (isEditMode)
@@ -113,34 +143,13 @@ public partial class admin_user_edit : BasePage
         foreach (RepeaterItem i in CheckBoxRepeater.Items)
         {
             CheckBox c = (CheckBox)i.FindControl("checkbox1");
-            UpdateRoleMembership(u, c);
+            allowed = SiteUtility.UpdateRoleMembership(u, c);
+			if (!allowed)
+				break;
         }
 
         // Clear the checkboxes
         PopulateCheckboxes();
-    }
-
-    private void UpdateRoleMembership(string u, CheckBox box)
-    {
-        // Array manipulation because cannot use Roles static method (need different appPath).
-        string role = box.Text;
-
-        bool boxChecked = box.Checked;
-        bool userInRole = Roles.IsUserInRole(u, role);
-        try
-        {
-            if (boxChecked && !userInRole)
-            {
-                Roles.AddUserToRoles(u, new string[] { role });
-            }
-            else if (!boxChecked && userInRole)
-            {
-                Roles.RemoveUserFromRoles(u, new string[] { role });
-            }
-        }
-        catch
-        {
-        }
     }
 
     public void UpdateUser(object sender, EventArgs e)
@@ -150,7 +159,6 @@ public partial class admin_user_edit : BasePage
             return;
         }
 
-        string resultMsg = "";
         string userIDText = UserID.Text;
         string emailText = Email.Text;
 
@@ -174,12 +182,14 @@ public partial class admin_user_edit : BasePage
         {
             MembershipUser mu = Membership.GetUser(userIDText);
 
-            mu.Email = Email.Text;
+			UpdateRoleMembership(userIDText);
+
+			mu.Email = Email.Text;
             mu.IsApproved = ActiveUser.Checked;
 
-            Membership.UpdateUser(mu);
 
-            UpdateRoleMembership(userIDText);
+
+            Membership.UpdateUser(mu);
 
             // Are we allowed to change secret question & answer?
             // We will need old password for this.
@@ -202,13 +212,28 @@ public partial class admin_user_edit : BasePage
                 mu.ChangePassword(password, newPassword);
             }
 
-            resultMsg = "User details has been successfully updated.";
+			//update additional profile properties, if any
+			ProfileBase p = ProfileBase.Create(mu.UserName);
+			if (p == null)
+			{
+				return;
+			}
+			p.SetPropertyValue("FirstName", FirstName.Text);
+			p.SetPropertyValue("LastName", LastName.Text);
+			p.SetPropertyValue("CommonName", CommonName.Text);
+			p.Save();
+
+			//if the user executing this page is the user that is being modified, reset the site map.
+			if (Profile.UserName == mu.UserName)
+			{
+				ResetSiteMap();
+			}
+            ResultMessage1.ShowSuccess("User details were successfully updated" + (!allowed ? ", <span class=\"validationError\">except for role memberships. You can't change your own roles -- you must ask another administrator to do that for you.</span>" : "."));
         }
         catch (Exception ex)
         {
-            resultMsg = "Failed to update user details. Error message: " + ex.Message;
+            ResultMessage1.ShowFail("Failed to update user details. ", ex);
         }
-		SetResultMessage(resultMsg); 
     }
 
     public void AddUser(object sender, EventArgs e)
@@ -219,7 +244,6 @@ public partial class admin_user_edit : BasePage
         }
 
         MembershipCreateStatus createStatus = MembershipCreateStatus.Success;
-        string resultMsg = "";
 
         string userIDText = UserID.Text;
         string emailText = Email.Text;
@@ -246,54 +270,57 @@ public partial class admin_user_edit : BasePage
                 mu = Membership.CreateUser(userIDText, password, emailText);
             }
 
-            if (createStatus == MembershipCreateStatus.Success && 
-                (mu != null && !string.IsNullOrEmpty(mu.UserName)))
-            {
-                UpdateRoleMembership(mu.UserName);
-            }
+			if (createStatus == MembershipCreateStatus.Success &&
+				(mu != null && !string.IsNullOrEmpty(mu.UserName)))
+			{
+				//new WebEvents.CreateUserSuccessEvent(this, userIDText).Raise();
+				UpdateRoleMembership(mu.UserName);
+			}
+			else
+			{
+				throw new Exception("Unknown failure occurred while creating user.");
+			}
+
+			//update additional profile properties, if any
+			ProfileBase p = ProfileBase.Create(mu.UserName);
+			if (p == null)
+			{
+				return;
+			}
+			p.SetPropertyValue("FirstName", FirstName.Text);
+			p.SetPropertyValue("LastName", LastName.Text);
+			p.SetPropertyValue("CommonName", CommonName.Text);
+			p.Save();
 
             SaveButton.Enabled = false;
 
-            resultMsg = "User has been successfully created.";
+            ResultMessage1.ShowSuccess("User has been successfully created.");
         }
         catch (Exception ex)
         {
-            resultMsg = "Failed to create new user. Error message: " + ex.Message;
-        }
-
-		SetResultMessage(resultMsg);
+            ResultMessage1.ShowFail("Failed to create new user. ", ex);
+			SaveButton.Enabled = false;
+		}
     }
-
-	private void SetResultMessage(string resultMsg)
-	{
-		trResultRow.Visible = !String.IsNullOrEmpty(resultMsg);
-		lblMessage.Text = resultMsg;		
-	}
 
     public bool IsUserInRole(string roleName)
     {
-        if (string.IsNullOrEmpty(userName) ||
-            string.IsNullOrEmpty(roleName))
-        {
-            return false;
-        }
-
-        return Roles.IsUserInRole(userName, roleName);  
+        //this method is called from the aspx page on databind.
+		return SiteUtility.IsUserInRole(userName, roleName);  
     }
+
 	protected void ResetPassword_Click(object sender, EventArgs e)
 	{
-		string resultMsg; 
 		try
 		{
 			MembershipUser mu = Membership.GetUser(UserID.Text);
 			mu.ResetPassword();
-			resultMsg = "User password has been reset. User will receive an email with the new password"; 
+			ResultMessage1.ShowSuccess("User password has been reset. User will receive an email with the new password");
 		}
 		catch(Exception ex)
 		{
-			resultMsg = "Could not reset user password. " + ex.Message; 
+			ResultMessage1.ShowFail("Could not reset user password. ", ex);
 		}
-		SetResultMessage(resultMsg); 
 	}
 	protected void unlockAccount_Click(object sender, EventArgs e)
 	{
@@ -302,17 +329,42 @@ public partial class admin_user_edit : BasePage
 			MembershipUser mu = Membership.GetUser(UserID.Text);
 			if(mu.UnlockUser())
 			{
-				Membership.UpdateUser(mu); 
-				SetResultMessage("User account unlocked"); 
+				Membership.UpdateUser(mu);
+				//new WebEvents.AccountUnlockedEvent(this, mu.UserName);
+				ResultMessage1.ShowSuccess("User account unlocked"); 
 			}
 			else
 			{
-				SetResultMessage("Could not unlock user account."); 
+				throw new Exception("Could not unlock user account.");
 			}
 		}
 		catch (Exception ex)
 		{
-			SetResultMessage("Could not unlock user account. " + ex.Message ); 	
+			ResultMessage1.ShowFail("Could not unlock user account. ", ex ); 	
 		}
 	}
+
+	public void EnabledChanged(object sender, EventArgs e)
+	{
+		CheckBox checkBox = sender as CheckBox;
+		if (checkBox == null)
+			return;
+
+		try
+		{
+			ResultMessage1.ShowSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
+		}
+		catch (Exception ex)
+		{
+			ResultMessage1.ShowFail("Unable to change account approval status. ", ex);
+		}
+	}
+
+
+	protected void ResetSiteMap()
+	{
+		SubSonicSiteMapProvider siteMap = (SubSonicSiteMapProvider)SiteMap.Provider;
+		siteMap.Reload();
+	}
+
 }

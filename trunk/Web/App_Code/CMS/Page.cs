@@ -14,6 +14,13 @@ namespace CMS {
         //used for sorting the lists
         public int Level = 0;
 
+		public bool _IsFourOFour = false;
+
+		public bool IsFourOFour
+		{
+			get { return _IsFourOFour; }
+			set { _IsFourOFour = value; }
+		}
 
     }
 }

@@ -1,5 +1,5 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="AutoScaffold.aspx.cs" Inherits="AutoScaffold" ValidateRequest="false" EnableEventValidation="false" Theme="Default" MasterPageFile="~/site.master" Title="SubSonic AutoScaffold" %>
-<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="AutoScaffold.aspx.cs" Inherits="AutoScaffold" ValidateRequest="false" EnableEventValidation="false" Theme="GCS" MasterPageFile="~/site.master" Title="SubSonic AutoScaffold" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="cphBody" Runat="Server">
 <table style="width: 100%" id="tblWrapper" runat="server">
 	<tr>
 		<td style="white-space:nowrap;font-size:8pt;font-family:'Segoe UI', Verdana, Tahoma; background-color:#d3d3d3">

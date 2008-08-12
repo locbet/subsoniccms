@@ -12,8 +12,14 @@ using SubSonic.Utilities;
 
 public partial class Login : BasePage
 {
-    protected void Page_Load(object sender, EventArgs e)
+	protected void Page_Load(object sender, EventArgs e)
     {
+		if (!Page.IsPostBack)
+		{
+			Control ctl = Login1.FindControl("LoginButton");
+			if (ctl != null && ctl is IButtonControl)
+				Login1.Attributes.Add("onkeypress", string.Format("javascript:return WebForm_FireDefaultButton(event, '{0}')", ctl.ClientID));
+		}
     }
 
     protected void NewRegistration(object sender, EventArgs e) {

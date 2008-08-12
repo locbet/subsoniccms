@@ -1,0 +1,17 @@
+﻿<!--
+    You can find existing browser definitions at
+    <windir>\Microsoft.NET\Framework\<ver>\CONFIG\Browsers
+		
+	execuse for adding this is found here:
+	http://todotnet.com/archive/0001/01/01/7472.aspx?Pending=true
+
+-->
+
+<browsers>
+	<!-- Assume this is a desktop browser -->
+	<browser id="IEGCS" parentID="IE">
+		<capabilities>
+			<capability name="tagwriter" value="System.Web.UI.HtmlTextWriter" />
+		</capabilities>
+	</browser>
+</browsers>

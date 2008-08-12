@@ -1,8 +1,9 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="Paragraph.ascx.cs" Inherits="Modules_Content_Paragraph" %>
+<div class="pageparagraph">
 <%if(SiteUtility.UserCanEdit()){%>
-    <div class=contentbox id=divHolder 
+    <div class="contentbox" id="divHolder"
     style="border:1px dashed white"
-    ondblclick="showPopWin('admin/CMSParagraph.aspx?id=<%=ContentName%>', 800, 650, null);"
+    ondblclick="showPopWin('CMS/CMSParagraph.aspx?id=<%=ContentName%>', 800, 650, null);"
     onmouseover="this.style.cursor='hand'; this.style.backgroundColor='AliceBlue'; this.style.border='1px dashed gainsboro';"
     onmouseout="this.style.backgroundColor='White'; this.style.border='1px dashed white';"
     title="Double Click to Edit">
@@ -15,3 +16,4 @@
     <%=ContentText %>
 </div>
 
+</div>
