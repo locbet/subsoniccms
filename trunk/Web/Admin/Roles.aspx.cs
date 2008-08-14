@@ -11,17 +11,8 @@ using System.Web.UI.HtmlControls;
 
 public partial class admin_roles : BasePage
 {
-    //private CMS.Page _thisPage;
-
 	protected void Page_Load(object sender, EventArgs e)
     {
-        //if (!Page.IsPostBack)
-        //{
-        //    _thisPage = new CMS.Page();
-        //    SiteUtility.BuildBasePage((BasePage)this, ref _thisPage, "Admin/Roles.aspx");
-        //    Master.thisPage = _thisPage;
-        //}
-
 		if (!Page.IsPostBack)
 		{
 			ddlRole.DataSource = allRolesDataSource;

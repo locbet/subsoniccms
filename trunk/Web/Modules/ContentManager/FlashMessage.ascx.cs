@@ -86,8 +86,8 @@ public partial class Modules_ContentManager_FlashMessage : System.Web.UI.UserCon
 	{
 
         //Set the duration, steps, etc. for the javascript fade in and fade out   
-        string js = "fadeIn(//" + lblMessage.ClientID + 
-            "//, " + FadeInSteps + 
+        string js = "fadeIn('" + lblMessage.ClientID + 
+            "', " + FadeInSteps + 
             ", " + FadeInDuration + 
             ", " + Interval + 
             ", " + FadeOutSteps + 

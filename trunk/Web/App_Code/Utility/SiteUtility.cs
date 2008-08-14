@@ -27,8 +27,8 @@ public class SiteUtility:SubSonic.Utilities.Utility
 
     public class Validation
     {
-        public const string ROLE_REGEX= "[0-9a-zA-z][0-9a-zA-Z\\s-]";
-        public const string USER_SEARCH_REGEX = "[0-9a-zA-z][0-9a-zA-Z\\s-]";
+        public const string ROLE_REGEX= "[0-9a-zA-z][0-9a-zA-Z\\s-]+";
+        public const string USER_SEARCH_REGEX = "[0-9a-zA-z][0-9a-zA-Z\\s-]+";
     }
 
     public static bool UserIsAdmin()

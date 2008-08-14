@@ -28,8 +28,8 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
     {
         divSuccess.Visible = true;
         divFail.Visible = false;
-        lblSuccess.Text = message + " - " + DateTime.Now;
 		flashMessageSuccess.Message = message + " - " + DateTime.Now;
+        flashMessageSuccess.Interval = 4000;
 		flashMessageSuccess.Display();
     }
 
@@ -42,9 +42,9 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
 	{
 		divSuccess.Visible = false;
 		divFail.Visible = true;
-		lblFail.Text = message + " - " + DateTime.Now + (SiteUtility.UserIsAdmin() && ex != null && !String.IsNullOrEmpty(ex.Message)? "<br /><br /> " + ex.Message : "");
 		flashMessageFail.Message = message + " - " + DateTime.Now + (SiteUtility.UserIsAdmin() && ex != null && !String.IsNullOrEmpty(ex.Message) ? "<br /><br /> " + ex.Message : "");
-		flashMessageFail.Display();
+        flashMessageFail.Interval = 8000;
+        flashMessageFail.Display();
 
 		//if (ex != null)
 		//{

@@ -33,15 +33,6 @@
             </tr>
             <tr>
                 <td>
-                    <asp:Label ID="Label3" runat="server" AssociatedControlID="CostCenter" Text="Cost Center: " CssClass="adminlabel"/>
-                </td>
-                <td>
-                    <asp:textbox runat="server" id="CostCenter" maxlength="128" tabindex="103" Columns="30" CssClass="adminlabel" />
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" runat="server" ControlToValidate="CostCenter" Display="Dynamic" EnableClientScript="true">required</asp:RequiredFieldValidator>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     <asp:Label ID="Label4" runat="server" AssociatedControlID="FirstName" Text="First Name: " CssClass="adminlabel"/>
                 </td>
                 <td>
