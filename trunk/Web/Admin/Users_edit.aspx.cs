@@ -284,6 +284,7 @@ public partial class admin_user_edit : BasePage
 			p.SetPropertyValue("FirstName", FirstName.Text);
 			p.SetPropertyValue("LastName", LastName.Text);
 			p.SetPropertyValue("CommonName", CommonName.Text);
+            p.SetPropertyValue("ThemePreference", ThemePreference.SelectedValue);
 			p.Save();
 
             SaveButton.Enabled = false;

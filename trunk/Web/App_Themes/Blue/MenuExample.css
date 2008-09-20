@@ -38,7 +38,7 @@
 {
     width: 10.5em;
     left: 8.9em;
-    top: -1em;
+    top: -1.5em;
     z-index: 400;
 }
 
@@ -52,7 +52,7 @@
 /* Use this rule create the common appearance of each menu item. */
 .PrettyMenu ul.AspNet-Menu li
 {
-    background:#dccece url(images/bg-menu-main.png) repeat-x;
+    background:#ccadad url(images/bg-menu-main.png) repeat-x;
 }
 
 /* Within each menu item is a link or a span, depending on whether or not the MenuItem has defined it's */
@@ -90,7 +90,7 @@
 .PrettyMenu ul.AspNet-Menu li:hover, 
 .PrettyMenu ul.AspNet-Menu li.AspNet-Menu-Hover
 {
-    background:#dccece url(images/bg-menu-main-selected.png) repeat-x;
+    background:#ccadad url(images/bg-menu-main-selected.png) repeat-x;
 }
 
 .PrettyMenu ul.AspNet-Menu li:hover a, 
@@ -134,7 +134,7 @@
 .PrettyMenu ul.AspNet-Menu li.AspNet-Menu-Leaf a:hover
 {
     /*background-image: none;*/
-    background:#dccece url(images/bg-menu-main-selected.png) repeat-x;
+    background:#ccadad url(images/bg-menu-main-selected.png) repeat-x;
 }
 
 
@@ -267,7 +267,7 @@
 
 #SampleMenu .Menu-Skin-StaticItem
 {
-    background:#dccece url(images/bg-menu-main.png) repeat-x;
+    background:#ccadad url(images/bg-menu-main.png) repeat-x;
     font-size: small;
 }
 

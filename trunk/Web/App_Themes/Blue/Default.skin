@@ -13,10 +13,6 @@ Default skin template. The following skins are provided as examples only.
 
 <asp:Image runat="server" ImageUrl="~/images/image1.jpg" />
 
-
-******* The following skins are just a look and feel that I like, that looks
-professional.
-
 --%>
 <%@ Register
     Assembly="AjaxControlToolkit"
@@ -27,6 +23,25 @@ professional.
 	Namespace="SubSonic" 
 	TagPrefix="subsonic" %>
 
+<asp:DetailsView runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+    <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <CommandRowStyle BackColor="#FFFFC0" Font-Bold="True" />
+    <RowStyle CSSClass="GridCell1"/>
+    <PagerStyle BackColor="#FFCC66" ForeColor="#333333" HorizontalAlign="Center" />
+    <FieldHeaderStyle BackColor="#FFFF99" Font-Bold="True" />
+    <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <AlternatingRowStyle CSSClass="GridCell2"/>
+</asp:DetailsView>
+
+<asp:DetailsView SkinID="LogDetail" runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+    <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <CommandRowStyle BackColor="#FFFFC0" Font-Bold="True" />
+    <RowStyle BackColor="#FFFBD6" ForeColor="#333333" />
+    <PagerStyle BackColor="#FFCC66" ForeColor="#333333" HorizontalAlign="Center" />
+    <FieldHeaderStyle BackColor="#FFFF99" Font-Bold="True" />
+    <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <AlternatingRowStyle BackColor="White" />
+</asp:DetailsView>
 
 <asp:GridView SkinId="dvDestinationSelection" runat="server" Style="border-right: gainsboro 1px solid;
     border-top: gainsboro 1px solid; font-size: 8pt; border-left: gainsboro 1px solid;
@@ -82,6 +97,7 @@ professional.
 
 
 <asp:Button runat="server" Width="85px"/>
+<asp:Button runat="server" Width="45px" SkinID="btnSearch" CSSClass="btnSearch"/>
 <asp:TextBox runat="server" Width="200px"/>
 <asp:TextBox SkinID="email" runat="server" Width="400px"/>
 <asp:TextBox SkinID="comments" runat="server" style="width:40em;height:4.5em;" Wrap="true" />

@@ -30,7 +30,7 @@ public partial class admin_tasks : BasePage
 
 		//filter the list of tasks against the approved exe list
 		ScheduledTasksCollection stSource = new ScheduledTasksCollection().Load();
-		ScheduledTasksCollection st = stSource; //.Filter("ApplicationName", coll.GetList(), "FullPath", true);
+		ScheduledTasksCollection st = stSource.Filter("ApplicationName", coll.GetList(), "FullPath", true);
 		dgTasks.DataSource = st;
 		dgTasks.DataBind();
         Master.Title = Master.Title + ": " + Environment.MachineName;

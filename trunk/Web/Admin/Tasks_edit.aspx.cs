@@ -83,13 +83,13 @@ public partial class admin_task_edit : BasePage
 			ddlApplicationName.DataBind();
 			if (rot != null && !String.IsNullOrEmpty(rot.ApplicationName))
 			{
-                //int i = coll.Find(CMS.TaskApplication.FullPathColumn.PropertyName, rot.ApplicationName.ToLower(), true);
-                //if (i >= 0)
-                //{
-                //    CMS.TaskApplication ta = coll[i];
-                //    if (ta != null && !String.IsNullOrEmpty(ta.Name))
-                //        ddlApplicationName.SelectedValue = ta.Name;
-                //}
+				int i = coll.Find(CMS.TaskApplication.FullPathColumn.PropertyName, rot.ApplicationName.ToLower(), true);
+				if (i >= 0)
+				{
+					CMS.TaskApplication ta = coll[i];
+					if (ta != null && !String.IsNullOrEmpty(ta.Name))
+						ddlApplicationName.SelectedValue = ta.Name;
+				}
 			}
 		}
 		else
