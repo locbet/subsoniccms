@@ -13,14 +13,18 @@ namespace CMS {
 
         //used for sorting the lists
         public int Level = 0;
-
-		public bool _IsFourOFour = false;
+        private bool _IsFourOFour = false;
 
 		public bool IsFourOFour
 		{
 			get { return _IsFourOFour; }
 			set { _IsFourOFour = value; }
 		}
+
+        public string FinalUrl
+        {
+            get { return (PageTypeID == 0 ? "~/view/" : "") + PageUrl; }
+        }
 
     }
 }

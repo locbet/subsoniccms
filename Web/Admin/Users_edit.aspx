@@ -58,6 +58,18 @@
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator10" runat="server" ControlToValidate="CommonName" Display="Dynamic" EnableClientScript="true">required</asp:RequiredFieldValidator>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <asp:Label ID="Label3" runat="server" AssociatedControlID="ThemePreference" Text="Theme Preference" CssClass="adminlabel"/>
+                </td>
+                <td>
+                    <asp:DropDownList ID="ThemePreference" runat="server">
+                        <asp:ListItem Text="Default" Value="Default"></asp:ListItem>
+                        <asp:ListItem Text="Blue" Value="Blue"></asp:ListItem>
+                    </asp:DropDownList>
+                    <asp:RequiredFieldValidator ID="RequiredFieldValidator7" runat="server" ControlToValidate="ThemePreference" Display="Dynamic" EnableClientScript="true">required</asp:RequiredFieldValidator>
+                </td>
+            </tr>
             <tr id="PasswordRow" runat="server" visible="false">
                 <td>
                     <asp:Label ID="lblPassword" runat="server" AssociatedControlID="Password" Text="Password: "/>

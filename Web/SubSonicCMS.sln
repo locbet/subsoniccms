@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Web Developer Express 2005
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\SubSonicCMS\", "..\SubSonicCMS\", "{1E527292-25D4-440D-BCCF-AF30B466091E}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\SubSonicCMS\", ".", "{1E527292-25D4-440D-BCCF-AF30B466091E}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.VirtualPath = "/SubSonicCMS"
 		Debug.AspNetCompiler.PhysicalPath = "..\SubSonicCMS\"
@@ -17,7 +17,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "C:\...\SubSonicCMS\", "..\S
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "50958"
+		VWDPort = "60185"
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject

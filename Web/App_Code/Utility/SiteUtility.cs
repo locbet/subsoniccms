@@ -69,12 +69,12 @@ public class SiteUtility:SubSonic.Utilities.Utility
 			if (boxChecked && !userInRole)
 			{
 				Roles.AddUserToRoles(u, new string[] { role });
-				//new WebEvents.AddUserToRolesSuccessEvent(HttpContext.Current, u, role).Raise();
+				new WebEvents.AddUserToRolesSuccessEvent(HttpContext.Current, u, role).Raise();
 			}
 			else if (!boxChecked && userInRole)
 			{
 				Roles.RemoveUserFromRoles(u, new string[] { role });
-				//new WebEvents.RemoveUserFromRolesSuccessEvent(HttpContext.Current, u, role).Raise();
+				new WebEvents.RemoveUserFromRolesSuccessEvent(HttpContext.Current, u, role).Raise();
 			}
 			return true;
 		}
@@ -84,13 +84,27 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		}
 	}
 
-	public static bool IsUserInRole(string u, string role)
+    public static bool IsUserInRole(string u, string[] roles)
+    {
+        foreach (string r in roles)
+        {
+            if (IsUserInRole(u, r))
+                return true;
+        }
+        return false;
+    }
+
+    public static bool IsUserInRole(string u, string role)
 	{
-		if (string.IsNullOrEmpty(u) ||
-			string.IsNullOrEmpty(role))
-		{
-			return false;
-		}
+        if (string.IsNullOrEmpty(u) ||
+            string.IsNullOrEmpty(role))
+        {
+            return false;
+        }
+        else if (role == "+")
+            return UserIsAuthenticated();
+        else if (role == "*")
+            return true;
 
 		return Roles.IsUserInRole(u, role);
 	}
@@ -101,7 +115,7 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		foreach (string r in roles)
 		{
 			Roles.RemoveUserFromRoles(u, new string[] { r });
-			//new WebEvents.RemoveUserFromRolesSuccessEvent(HttpContext.Current, u, r).Raise();
+			new WebEvents.RemoveUserFromRolesSuccessEvent(HttpContext.Current, u, r).Raise();
 		}
 	}
 
@@ -121,12 +135,12 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		string msg = "";
 		if (user.IsApproved)
 		{
-			//new WebEvents.AccountApprovedEvent(HttpContext.Current, user.UserName).Raise();
+			new WebEvents.AccountApprovedEvent(HttpContext.Current, user.UserName).Raise();
 			msg = user.UserName + "'s account has been approved.";
 		}
 		else
 		{
-			//new WebEvents.AccountUnapprovedEvent(HttpContext.Current, user.UserName).Raise();
+			new WebEvents.AccountUnapprovedEvent(HttpContext.Current, user.UserName).Raise();
 			msg = user.UserName + "'s account has been denied access to the site.";
 		}
 		if (String.IsNullOrEmpty(msg))
@@ -141,10 +155,10 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		//we're keeping all the data, except roles. remove those.
 		SiteUtility.RemoveUserFromAllRoles(userName);
 		Membership.DeleteUser(userName, false);
-		//new WebEvents.DeleteUserSuccessEvent(HttpContext.Current, userName);
+		new WebEvents.DeleteUserSuccessEvent(HttpContext.Current, userName);
 		if (userName == HttpContext.Current.User.Identity.Name.ToString())
 		{
-			//new WebEvents.LogoutSuccessEvent(HttpContext.Current, HttpContext.Current.User.Identity.Name.ToString()).Raise();
+			new WebEvents.LogoutSuccessEvent(HttpContext.Current, HttpContext.Current.User.Identity.Name.ToString()).Raise();
 			FormsAuthentication.SignOut();
 			HttpContext.Current.Response.Redirect("~/default.aspx", false);
 		}
@@ -160,8 +174,12 @@ public class SiteUtility:SubSonic.Utilities.Utility
 			if (thisPage == null || thisPage.PageID == 0)
 			{
 				thisPage = new CMS.Page();
-				throw new Exception("Page not found.");
+                throw new CMS.PageNotFoundException();
 			}
+            else if (pageUrl != "notfound.aspx" && pageUrl != "login.aspx" && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.ViewRoles.Split(new char[] { ',', ';' }, 512)) && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.EditRoles.Split(new char[] { ',', ';' }, 512)))
+            {
+                throw new CMS.PageNotAuthorizedException();
+            }
 
 			//add browser window title
 			thisBase.Title = thisPage.Title;
@@ -180,15 +198,25 @@ public class SiteUtility:SubSonic.Utilities.Utility
 			head.Controls.Add(meta);
 			thisPage.IsFourOFour = false;
 		}
-		catch
+        catch (CMS.PageNotFoundException)
 		{
 			thisPage.Title = "Oops! Can't find that page...";
 			thisBase.Title = thisPage.Title;
 			string FourOFourText = SubSonic.Sugar.Files.GetFileText(HttpContext.Current.Server.MapPath("~/CMSFiles/404.htm"));
 			thisPage.Body = FourOFourText;
-			thisPage.IsFourOFour = true;
+            thisPage.IsFourOFour = true;
 		}
+        catch 
+        {
+            throw;
+        }
         thisMaster.thisPage = thisPage;
 		return;
 	}
+
+    public static bool UserCanSearch()
+    {
+        // you can add special logic if search should be limited on your site
+        return true;
+    }
 }

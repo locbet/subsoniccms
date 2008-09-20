@@ -12,20 +12,12 @@ using System.Web.Profile;
 
 public partial class admin_user_edit : BasePage
 {
-    //private CMS.Page _thisPage;
 	bool isEditMode = true;
     string userName = HttpContext.Current.Request["username"];
 	bool allowed = true;
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
-        //if (!Page.IsPostBack)
-        //{
-        //    _thisPage = new CMS.Page();
-        //    SiteUtility.BuildBasePage((BasePage)this, ref _thisPage, "Admin/Users_edit.aspx");
-        //    Master.thisPage = _thisPage;
-        //}
 		// Is in add mode?
         //
         if (string.IsNullOrEmpty(userName))
@@ -123,6 +115,7 @@ public partial class admin_user_edit : BasePage
 		FirstName.Text = p.GetPropertyValue("FirstName").ToString();
 		LastName.Text = p.GetPropertyValue("LastName").ToString();
 		CommonName.Text = p.GetPropertyValue("CommonName").ToString();
+        ThemePreference.SelectedValue = p.GetPropertyValue("ThemePreference").ToString();
 	}
 
     public void SaveClick(object sender, EventArgs e)
@@ -221,6 +214,7 @@ public partial class admin_user_edit : BasePage
 			p.SetPropertyValue("FirstName", FirstName.Text);
 			p.SetPropertyValue("LastName", LastName.Text);
 			p.SetPropertyValue("CommonName", CommonName.Text);
+            p.SetPropertyValue("ThemePreference", ThemePreference.SelectedValue);
 			p.Save();
 
 			//if the user executing this page is the user that is being modified, reset the site map.
@@ -273,7 +267,7 @@ public partial class admin_user_edit : BasePage
 			if (createStatus == MembershipCreateStatus.Success &&
 				(mu != null && !string.IsNullOrEmpty(mu.UserName)))
 			{
-				//new WebEvents.CreateUserSuccessEvent(this, userIDText).Raise();
+				new WebEvents.CreateUserSuccessEvent(this, userIDText).Raise();
 				UpdateRoleMembership(mu.UserName);
 			}
 			else
@@ -330,7 +324,7 @@ public partial class admin_user_edit : BasePage
 			if(mu.UnlockUser())
 			{
 				Membership.UpdateUser(mu);
-				//new WebEvents.AccountUnlockedEvent(this, mu.UserName);
+				new WebEvents.AccountUnlockedEvent(this, mu.UserName);
 				ResultMessage1.ShowSuccess("User account unlocked"); 
 			}
 			else

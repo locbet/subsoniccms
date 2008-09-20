@@ -82,6 +82,7 @@ professional.
 
 
 <asp:Button runat="server" Width="85px"/>
+<asp:Button runat="server" Width="45px" CssClass="btnSearch" SkinID="btnSearch"/>
 <asp:TextBox runat="server" Width="200px"/>
 <asp:TextBox SkinID="email" runat="server" Width="400px"/>
 <asp:TextBox SkinID="comments" runat="server" style="width:40em;height:4.5em;" Wrap="true" />

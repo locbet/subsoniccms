@@ -20,15 +20,11 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
     }
 	public void HideAll()
 	{
-		divSuccess.Visible = false;
-		divFail.Visible = false;
 	}
 
 	public void ShowSuccess(string message)
     {
-        divSuccess.Visible = true;
-        divFail.Visible = false;
-		flashMessageSuccess.Message = message + " - " + DateTime.Now;
+        flashMessageSuccess.Message = "<div class=\"divSuccess\"><div class=\"validationSummarySuccess\">" + message + " - " + DateTime.Now + "</div></div>";
         flashMessageSuccess.Interval = 4000;
 		flashMessageSuccess.Display();
     }
@@ -40,9 +36,7 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
 
 	public void ShowFail(string message, Exception ex)
 	{
-		divSuccess.Visible = false;
-		divFail.Visible = true;
-		flashMessageFail.Message = message + " - " + DateTime.Now + (SiteUtility.UserIsAdmin() && ex != null && !String.IsNullOrEmpty(ex.Message) ? "<br /><br /> " + ex.Message : "");
+        flashMessageFail.Message = "<div class=\"divFail\"><div class=\"validationSummaryError\">" + message + " - " + DateTime.Now + (SiteUtility.UserIsAdmin() && ex != null && !String.IsNullOrEmpty(ex.Message) ? "<br /><br /> " + ex.Message : "") + "</div></div>";
         flashMessageFail.Interval = 8000;
         flashMessageFail.Display();
 

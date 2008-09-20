@@ -1,0 +1,8 @@
+<SearchPlugin xmlns:os="http://a9.com/-/spec/opensearch/1.1/">
+	<os:ShortName>SubSonic CMS</os:ShortName>
+	<os:Description>Enter a search term</os:Description>
+	<os:InputEncoding>UTF-8</os:InputEncoding>
+	<os:Image width="16" height="16">http://localhost/SubSonicCMS/favicon.ico</os:Image>
+	<os:Url type="text/html" method="POST" template="http://localhost/SubSonicCMS/search/{searchTerms}">
+	</os:Url>
+</SearchPlugin>

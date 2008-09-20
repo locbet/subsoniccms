@@ -12,16 +12,8 @@ using System.Web.Administration;
 
 public partial class admin_users : BasePage
 {
-//	private CMS.Page _thisPage = new CMS.Page();
-
 	protected void Page_Load(object sender, EventArgs e)
     {
-        //if (!Page.IsPostBack)
-        //{
-        //    _thisPage = new CMS.Page();
-        //    SiteUtility.BuildBasePage((BasePage)this, ref _thisPage, "Admin/Users.aspx");
-        //    Master.thisPage = _thisPage;
-        //}
 	}
 
 	protected void Page_Init(object sender, EventArgs e)

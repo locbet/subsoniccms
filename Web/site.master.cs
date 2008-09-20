@@ -16,12 +16,18 @@ public partial class site : BaseMasterPage
         if (!Page.IsPostBack) {
             Head1.Controls.Add(new LiteralControl("<script type='text/javascript' src='" + Page.ResolveUrl("~/js/modal/common.js") + "'></script>"));
             Head1.Controls.Add(new LiteralControl("<script type='text/javascript' src='" + Page.ResolveUrl("~/js/modal/subModal.js") + "'></script>"));
-            Head1.Controls.Add(new LiteralControl("<link id=\"Link1\" rel=\"stylesheet\" type=\"text/css\" href=\"" + Page.ResolveUrl("~/js/modal/subModal.css") + " runat=\"server\" />"));
+            Head1.Controls.Add(new LiteralControl("<link id=\"Link1\" rel=\"stylesheet\" type=\"text/css\" href=\"" + Page.ResolveUrl("~/js/modal/subModal.css") + "\" runat=\"server\" />"));
             Head1.Controls.Add(new LiteralControl("<link rel=\"stylesheet\" href=\"" + Page.ResolveUrl("~/App_Themes/" + Page.Theme + "/MenuExample.css") + "\" type=\"text/css\" />"));
             Head1.Controls.Add(new LiteralControl("<link rel=\"shortcut icon\" href=\"" + Page.ResolveUrl("~/App_Themes/" + Page.Theme + "/images/favicon.ico") + "\" />"));
 
             
             siteMenu.PreRender += new EventHandler(siteMenu_PreRender);
+
+			if (SiteUtility.UserCanSearch())
+			{
+				txtSiteSearch.Visible = true;
+				btnSiteSearch.Visible = true;
+			}
 
 			siteMenu.Visible = true;
 			SiteMapPath1.Visible = true;
@@ -37,7 +43,7 @@ public partial class site : BaseMasterPage
 
     protected void lnkLogout_Click1(object sender, EventArgs e) {
 
-		//new WebEvents.LogoutSuccessEvent(this, Page.User.Identity.Name.ToString()).Raise();
+		new WebEvents.LogoutSuccessEvent(this, Page.User.Identity.Name.ToString()).Raise();
 		FormsAuthentication.SignOut();
          Response.Redirect("~/default.aspx", false);
    }
@@ -80,7 +86,14 @@ public partial class site : BaseMasterPage
 
 	protected void btnSiteSearch_Click(object sender, EventArgs e)
 	{
-
+		if (Page.IsValid && SubSonic.Sugar.Validation.IsAlphaNumeric(txtSiteSearch.Text.Trim(), true) && SiteUtility.UserCanSearch())
+		{
+			Response.Redirect("~/search/" + HttpUtility.UrlEncode(txtSiteSearch.Text.Trim()));
+		}
+		else
+		{
+			new WebEvents.InputValidationEvent(this, "Search validation failed.").Raise();
+		}
 	}
 
    #endregion
