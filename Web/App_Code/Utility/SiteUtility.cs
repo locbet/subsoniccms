@@ -52,6 +52,11 @@ public class SiteUtility:SubSonic.Utilities.Utility
 			return false;
 	}
 
+    public static bool UserCanSearch()
+    {
+        // you can add special logic if search should be limited on your site
+        return true;
+    }
 	public static bool UpdateRoleMembership(string u, CheckBox box)
 	{
 		return SiteUtility.UpdateRoleMembership(u, box.Text, box.Checked);
@@ -213,10 +218,4 @@ public class SiteUtility:SubSonic.Utilities.Utility
         thisMaster.thisPage = thisPage;
 		return;
 	}
-
-    public static bool UserCanSearch()
-    {
-        // you can add special logic if search should be limited on your site
-        return true;
-    }
 }

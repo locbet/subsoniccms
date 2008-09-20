@@ -40,10 +40,10 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
         flashMessageFail.Interval = 8000;
         flashMessageFail.Display();
 
-		//if (ex != null)
-		//{
-		//	new WebEvents.InputValidationEvent(this.Page, message + "\r\n" + ex.Message).Raise();
-		//}
+		if (ex != null)
+		{
+			new WebEvents.InputValidationEvent(this.Page, message + "\r\n" + ex.Message).Raise();
+		}
 	}
 
     protected string GetPath()
