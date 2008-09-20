@@ -42,6 +42,7 @@
         }
     </script>
     
-
-    <asp:Label ID="lblMessage" runat="server" style="display:none" />     
+<div>
+    <asp:Label ID="lblMessage" runat="server" style="display:none;" />     
+</div>
  

@@ -38,7 +38,7 @@ public partial class admin_roles : BasePage
 				RegexStringValidator r = new RegexStringValidator(SiteUtility.Validation.ROLE_REGEX);
 				r.Validate(roleName);
 				Roles.DeleteRole(roleName, true);
-				//new WebEvents.RemoveRolesSuccessEvent(this, roleName).Raise();
+				new WebEvents.RemoveRolesSuccessEvent(this, roleName).Raise();
 				updateGrid();
 				ResultMessage1.ShowSuccess(roleName + " was successfully deleted.");
 			}
@@ -71,7 +71,7 @@ public partial class admin_roles : BasePage
 				RegexStringValidator r = new RegexStringValidator(SiteUtility.Validation.ROLE_REGEX);
 				r.Validate(roleName);
 				Roles.CreateRole(roleName);
-				//new WebEvents.AddRolesSuccessEvent(this, roleName).Raise();
+				new WebEvents.AddRolesSuccessEvent(this, roleName).Raise();
 				updateGrid();
 				ResultMessage1.ShowSuccess(roleName + " was successfully added.");
 			}

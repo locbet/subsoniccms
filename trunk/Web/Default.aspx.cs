@@ -11,11 +11,8 @@ using System.Web.UI.HtmlControls;
 
 public partial class _Default : BasePage
 {
-//	protected CMS.Page thisPage = new CMS.Page();
 	protected void Page_Load(object sender, EventArgs e)
     {
-//		SiteUtility.BuildBasePage((BasePage)this, ref thisPage, "default.aspx");
-//		Master.thisPage = thisPage;
     }
 
 }

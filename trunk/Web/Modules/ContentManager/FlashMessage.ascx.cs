@@ -18,7 +18,6 @@ public partial class Modules_ContentManager_FlashMessage : System.Web.UI.UserCon
     int _FadeInSteps = 20;
     int _FadeOutDuration = 500;
     int _FadeOutSteps = 20;
-    //bool _InsertJavascript = true;
 
 	protected void Page_Load(object sender, EventArgs e)
 	{
@@ -94,8 +93,8 @@ public partial class Modules_ContentManager_FlashMessage : System.Web.UI.UserCon
             ", " + FadeOutDuration + ");";
 
 
-        //Find the script manager on the page, and the update panel the FlashMessage control
-        //is nested in
+        //Find the script manager on the page, and the update panel that the FlashMessage 
+		//control is nested in
         ScriptManager sm = ScriptManager.GetCurrent(this.Page);
         UpdatePanel up = (UpdatePanel)GetParentOfType(lblMessage, typeof(UpdatePanel));
 
@@ -105,13 +104,13 @@ public partial class Modules_ContentManager_FlashMessage : System.Web.UI.UserCon
             //The user control is nested in an update panel, register the javascript with the script manager and
             //attach it to the update panel in order to fire it after the async postback
             if (sm.IsInAsyncPostBack)
-                ScriptManager.RegisterClientScriptBlock(up, typeof(UpdatePanel), "jscript1", js, true);
+                ScriptManager.RegisterClientScriptBlock(up, typeof(UpdatePanel), "FlashMessage", js, true);
 		}
         else
 		{
             //The user control is not in an update panel (or there is no script manager on the page), 
             //so register the javascript for a normal postback
-            this.Page.ClientScript.RegisterStartupScript(this.GetType(), "jscript1", js, true);
+            this.Page.ClientScript.RegisterStartupScript(this.GetType(), "FlashMessageNoPanel", js, true);
         }
 
     }

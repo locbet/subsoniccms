@@ -35,8 +35,8 @@ namespace CMS {
             //take the page URL, which should be something like "this-is-the-page-name.aspx"
             //and query on it
             Page p = new Page("pageUrl", pageUrl);
-            if (!p.IsLoaded || p.Deleted) {
-                throw new Exception("There is no page corresponding to " + pageUrl);
+            if (!p.IsLoaded || p.PageID <= 0 || p.Deleted) {
+                throw new CMS.PageNotFoundException();
             }
 
             return p;
@@ -52,12 +52,42 @@ namespace CMS {
             //take the page URL, which should be something like "this-is-the-page-name.aspx"
             //and query on it
             Page p = new Page(pageID);
-			if (!p.IsLoaded || p.Deleted)
-			{
-                throw new Exception("There is no page corresponding to " + pageID.ToString());
+            if (!p.IsLoaded || p.PageID <= 0 || p.Deleted)
+            {
+                throw new CMS.PageNotFoundException();
             }
 
             return p;
+        }
+
+        public static PageCollection Search(string searchText)
+        {
+            CMS.PageCollection coll = new PageCollection();
+
+            coll = new SubSonic.Select().From(CMS.Page.Schema).Where(CMS.Page.Columns.Title).Like("%" + searchText + "%").And(CMS.Page.Columns.Deleted).IsEqualTo(false).And(CMS.Page.Columns.PageTypeID).IsNotEqualTo(-1).ExecuteAsCollection<CMS.PageCollection>();
+            coll.AddRange(new SubSonic.Select().From(CMS.Page.Schema).Where(CMS.Page.Columns.Keywords).Like("%" + searchText + "%").And(CMS.Page.Columns.Deleted).IsEqualTo(false).And(CMS.Page.Columns.PageTypeID).IsNotEqualTo(-1).ExecuteAsCollection<CMS.PageCollection>());
+            coll.AddRange(new SubSonic.Select().From(CMS.Page.Schema).Where(CMS.Page.Columns.MenuTitle).Like("%" + searchText + "%").And(CMS.Page.Columns.Deleted).IsEqualTo(false).And(CMS.Page.Columns.PageTypeID).IsNotEqualTo(-1).ExecuteAsCollection<CMS.PageCollection>());
+            coll.AddRange(new SubSonic.Select().From(CMS.Page.Schema).Where(CMS.Page.Columns.Summary).Like("%" + searchText + "%").And(CMS.Page.Columns.Deleted).IsEqualTo(false).And(CMS.Page.Columns.PageTypeID).IsNotEqualTo(-1).ExecuteAsCollection<CMS.PageCollection>());
+
+
+            CMS.PageCollection coll1 = new PageCollection();
+            foreach (CMS.Page p in coll)
+            {
+                bool addIt = true;
+                foreach (CMS.Page p1 in coll1)
+                {
+                    if (p1.PageID == p.PageID)
+                    {
+                        addIt = false;
+                        break;
+                    }
+                }
+                if (addIt)
+                    coll1.Add(p);
+            }
+
+            return coll1;
+
         }
 
         /// <summary>

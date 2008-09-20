@@ -16,12 +16,14 @@ public partial class PageView : BasePage
     protected void Page_Init(object sender, EventArgs e) {
         Body.SkinPath = "skins/office2003/";
         Session["FCKeditor:UserFilesPath"] = Page.ResolveUrl("~/CMSFiles");
-		// stolen from 
+		// picked up at
 		// http://www.subsonicproject.com/forums/thread/code-share/2257.aspx
 		// Disable viewstate for all edit controls since
 		// these won't be used when not editing
-		foreach (Control control in pnlEdit.Controls)
-			control.EnableViewState = SiteUtility.UserCanEdit();
+        string pageUrl = SubSonic.Utilities.Utility.GetParameter("p");
+        foreach (Control control in pnlEdit.Controls)
+            control.EnableViewState = (pageUrl == "editpage.aspx" || pageUrl == "newpage.aspx");
+
 	}
 
     protected void Page_Load(object sender, EventArgs e)
@@ -37,8 +39,8 @@ public partial class PageView : BasePage
             switch (pageUrl)
             {
                 case "newpage.aspx":
-                    SetupNewPage();
                     this.BuildBasePage("view/newpage.aspx");
+                    SetupNewPage();
                     break;
                 case "editpage.aspx":
                     string pageRef = SubSonic.Utilities.Utility.GetParameter("pRef");
@@ -65,7 +67,6 @@ public partial class PageView : BasePage
         //ParentID.Enabled = false;
         btnSetParent.Enabled = false;
 		chkShowInMenu.Checked = true;
-		pnlStaticURL.Visible = false;
 		chkShowEditLinks.Checked = true;
         
         LoadRoles();
@@ -101,7 +102,6 @@ public partial class PageView : BasePage
 				txtStaticURL.Text = thisPage.PageUrl;
 				break;
 		}
-		SetPageTypeItems(thisPage.PageTypeID.ToString());
 
 		//set the delete confirmation
         btnDelete.Attributes.Add("onclick", "return CheckDelete();");
@@ -110,34 +110,13 @@ public partial class PageView : BasePage
         LoadPageHierarchy();
         LoadParentDrop();
 		LoadPageTypes();
+        ddlEditRoles.SelectedValue = (thisPage.EditRoles == "*" ? "-1" : (thisPage.EditRoles == "+" ? "0" : "1"));
+        ddlViewRoles.SelectedValue = (thisPage.ViewRoles == "*" ? "-1" : (thisPage.ViewRoles == "+" ? "0" : "1"));
+        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlEditRoles.ClientID, "toggleRoleItems('" + ddlEditRoles.ClientID + "','divEditRoles')");
+        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlViewRoles.ClientID, "toggleRoleItems('" + ddlViewRoles.ClientID + "','divEditRoles')");
+        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlPageType.ClientID, "togglePageTypeItems('" + ddlPageType.ClientID + "')");
     }
 
-	void SetPageTypeItems(string pageTypeID)
-	{
-		if (!String.IsNullOrEmpty(pageTypeID))
-		{
-			switch (Int32.Parse(pageTypeID))
-			{
-				case -1:
-					pnlStaticURL.Visible = false;
-					Body.Visible = false;
-					break;
-				case 0:
-					pnlStaticURL.Visible = false;
-					Body.Visible = true;
-					break;
-				case 1:
-					pnlStaticURL.Visible = true;
-					Body.Visible = true;
-					break;
-				default:
-					pnlStaticURL.Visible = false;
-					//we don't support this page type, so don't show the editor
-					ToggleEditor(false);
-					break;
-			}
-		}
-	}
     #endregion
 
     #region Button Events
@@ -158,40 +137,49 @@ public partial class PageView : BasePage
         ResetParent();
     }
 
-	protected void ddlPageType_SelectedIndexChanged(object sender, EventArgs e)
-	{
-		SetPageTypeItems(ddlPageType.SelectedValue);
-	}
-
-
     #endregion
 
     #region Control loaders
 
-    void LoadRoles() {
-        if (chkRoles.Items.Count == 0) {
+    void LoadRoles()
+    {
+        if (Master.thisPage != null)
+        {
+            LoadRoles(chkEditRoles, ddlEditRoles, Master.thisPage.EditRoles);
+            LoadRoles(chkViewRoles, ddlViewRoles, Master.thisPage.ViewRoles);
+        }
+    }
+
+    void LoadRoles(CheckBoxList cbl, DropDownList ddl, string rolesToCheck)
+    {
+        if (cbl.Items.Count == 0)
+        {
             string[] roles = Roles.GetAllRoles();
-            chkRoles.Items.Clear();
-            foreach (string s in roles) {
+            cbl.Items.Clear();
+            foreach (string s in roles)
+            {
                 ListItem item = new ListItem(s);
-                chkRoles.Items.Add(item);
+                cbl.Items.Add(item);
             }
 
-            if (Master.thisPage != null)
+            if (Master.thisPage != null && Master.thisPage.PageUrl == "view/newpage.aspx")
+                return;
+            //set the roles
+            foreach (ListItem item in cbl.Items)
             {
-                //set the roles
-                foreach (ListItem item in chkRoles.Items)
+                if (rolesToCheck == "*")
                 {
-                    if (Master.thisPage.Roles == "*")
+                    ddl.SelectedValue = "-1";
+                }
+                else if (rolesToCheck == "+")
+                {
+                    ddl.SelectedValue = "0";
+                }
+                else
+                {
+                    if (rolesToCheck.Contains(item.Value))
                     {
                         item.Selected = true;
-                    }
-                    else
-                    {
-                        if (Master.thisPage.Roles.Contains(item.Value))
-                        {
-                            item.Selected = true;
-                        }
                     }
                 }
             }
@@ -294,7 +282,7 @@ public partial class PageView : BasePage
 				}
 
 			}
-			ddlPageType.SelectedValue = (Master.thisPage != null && !String.IsNullOrEmpty(Master.thisPage.PageTypeID.ToString()) ? Master.thisPage.PageTypeID.ToString() : "0");
+			ddlPageType.SelectedValue = (Master.thisPage != null && Master.thisPage.PageUrl != "view/newpage.aspx" && !String.IsNullOrEmpty(Master.thisPage.PageTypeID.ToString()) ? Master.thisPage.PageTypeID.ToString() : "0");
 		}
 	}
 
@@ -322,27 +310,8 @@ public partial class PageView : BasePage
 		thisPage.MenuTitle = txtMenuTitle.Text;
         thisPage.Keywords = txtKeywords.Text;
 		thisPage.Ordinal = Int32.Parse(txtOrdinal.Text);
-
-        string selectedRoles = string.Empty;
-        bool isAllRoles = true;
-        foreach (ListItem item in chkRoles.Items) {
-            if (item.Selected) {
-                selectedRoles += item.Value + ",";
-            } else {
-                isAllRoles = false;
-            }
-        }
-        if (isAllRoles) {
-            selectedRoles = "*";
-        } else {
-            if (selectedRoles.Length > 0) {
-                selectedRoles = selectedRoles.Remove(selectedRoles.Length - 1, 1);
-            } else {
-                selectedRoles = "*";
-            }
-        }
-
-        thisPage.Roles = selectedRoles;
+        thisPage.ViewRoles = GetSelectedRoles(chkViewRoles, ddlViewRoles);
+        thisPage.EditRoles = GetSelectedRoles(chkEditRoles, ddlEditRoles);
 
         if (ParentID.SelectedIndex != 0) {
             thisPage.ParentID = int.Parse(ParentID.SelectedValue);
@@ -366,6 +335,34 @@ public partial class PageView : BasePage
 		{
 			Response.Redirect((thisPage.PageTypeID == 1 ? "" : "~/view/") + thisPage.PageUrl);
 		}
+    }
+    
+    string GetSelectedRoles(CheckBoxList cbl, DropDownList ddl)
+    {
+        string selectedRoles = string.Empty;
+        if (ddl.SelectedValue == "-1")
+            selectedRoles = "*";
+        else if (ddl.SelectedValue == "0")
+            selectedRoles = "+";
+        else if (ddl.SelectedValue == "1")
+        {
+            foreach (ListItem item in cbl.Items)
+            {
+                if (item.Selected)
+                {
+                    selectedRoles += item.Value + ",";
+                }
+            }
+            if (selectedRoles.Length > 0)
+            {
+                selectedRoles = selectedRoles.Remove(selectedRoles.Length - 1, 1);
+            }
+            else
+            {
+                selectedRoles = "+";
+            }
+        }
+        return selectedRoles;
     }
 
     void DeletePage() {

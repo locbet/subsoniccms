@@ -11,12 +11,9 @@ using System.Web.UI.HtmlControls;
 
 public partial class Admin_CMSPageList : BasePage
 {
-    //protected CMS.Page thisPage = new CMS.Page();
 
 	protected void Page_Load(object sender, EventArgs e)
     {
-        //SiteUtility.BuildBasePage((BasePage)this, ref thisPage, "cms/cmspagelist.aspx");
-        //Master.thisPage = thisPage;
 		grdAllPages.DataSource = new SubSonic.Query("CMS_page").WHERE("Deleted", 0).ExecuteReader();
 		grdAllPages.DataBind();
     }

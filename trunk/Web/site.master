@@ -2,11 +2,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-<head id="Head1" runat="server">
+<head id="Head1" runat="server" profile="http://a9.com/-/spec/opensearch/1.1/">
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <link id="Link1" rel="stylesheet" type="text/css" href='~/js/modal/subModal.css' runat="server" />
     <title></title>
     <link runat="server" rel="stylesheet" href="~/CSS/Import.css" type="text/css" id="AdaptersInvariantImportCSS" />
+    <link rel="search" type="application/opensearchdescription+xml" href="opensearch-content.xml" title="Content Search" />
 	<!--[if lt IE 7]>
 		<link runat="server" rel="stylesheet" href="~/CSS/BrowserSpecific/IEMenu6.css" type="text/css" id="IEMenu6CSS" />
 	<![endif]--> 
@@ -37,46 +38,48 @@
 				</LoggedInTemplate>
 			</asp:LoginView>
 		</div>
+		<div id="searchbox">
+			<asp:Panel ID="pnlSearchBox" runat="server" DefaultButton="btnSiteSearch">
+				<asp:TextBox ID="txtSiteSearch" runat="server" MaxLength="100" TextMode="SingleLine" ValidationGroup="siteSearchValidation" CausesValidation="true" Width="150px" Visible="false"></asp:TextBox>
+				<ajax:TextBoxWatermarkExtender ID="txtweSiteSearch" runat="server" TargetControlID="txtSiteSearch" WatermarkText="Search" WatermarkCssClass="watermarktext"></ajax:TextBoxWatermarkExtender>
+				<ajax:AutoCompleteExtender ID="aceSiteSearch" runat="server" TargetControlID="txtSiteSearch" ServiceMethod="GetSearchCompletionList" ServicePath="entities.asmx" MinimumPrefixLength="1" ></ajax:AutoCompleteExtender>
+				<asp:Button ID="btnSiteSearch" runat="server" Text="Go!" SkinID="btnSearch" CausesValidation="true" ValidationGroup="siteSearchValidation" OnClick="btnSiteSearch_Click" Visible="false"/>
+			</asp:Panel>
+		</div>
 		<div id="title">
 			<a href='<%=Page.ResolveUrl("~/default.aspx") %>'>
 			<img alt="logo" src='<%=Page.ResolveUrl("~/images/logo.png") %>' /> </a>
 		</div>
-        <div id="mainmenu">
-            <div id="searchbox">
-	            <asp:Panel ID="pnlSearchBox" runat="server" DefaultButton="btnSiteSearch">
-		            <asp:TextBox ID="txtSiteSearch" runat="server" MaxLength="100" TextMode="SingleLine" ValidationGroup="siteSearchValidation" CausesValidation="true" Width="150px" Visible="false"></asp:TextBox>
-		            <ajax:TextBoxWatermarkExtender ID="txtweSiteSearch" runat="server" TargetControlID="txtSiteSearch" WatermarkText="Search" WatermarkCssClass="watermarktext"></ajax:TextBoxWatermarkExtender>
-<%--					<ajax:AutoCompleteExtender ID="aceSiteSearch" runat="server" TargetControlID="txtSiteSearch" ServiceMethod="GetSearchCompletionList" ServicePath="entities.asmx" MinimumPrefixLength="1" ></ajax:AutoCompleteExtender>
---%>					<asp:Button ID="btnSiteSearch" runat="server" Text="Go!" CssClass="btnSearch" CausesValidation="true" ValidationGroup="siteSearchValidation" Width="45px" OnClick="btnSiteSearch_Click" Visible="false"/>
-	            </asp:Panel>
-            </div>
-            <asp:Menu runat="server" ID="siteMenu" DataSourceID="SiteMapDataSource1" StaticDisplayLevels="2" Orientation="Horizontal" CssSelectorClass="PrettyMenu" Visible="false">
-            </asp:Menu>
-            <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" ShowStartingNode="false" />
-        </div>
+		<div id="mainmenu">
+			<asp:Menu runat="server" ID="siteMenu" DataSourceID="SiteMapDataSource1" StaticDisplayLevels="2" Orientation="Horizontal" CssSelectorClass="PrettyMenu" Visible="false">
+			</asp:Menu>
+			<asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" ShowStartingNode="false" />
+		</div>
 		
 		<asp:Panel ID="PNL_PageHeader" runat="server" Visible="true" CssClass="pageheader">
-			<div>
+			<div id="pageheader">
 				<asp:contentplaceholder  id="cphMessageBar" runat="server">
 				</asp:contentplaceholder>
 				<div>
-					<div class="pageheader">
-						<h1 class="pagetitle"><%=Title %></h1>
+					<div>
+						<h1 id="pageTitle"><%=Title %></h1>
 					</div>
-					<asp:contentplaceholder id="cphTopNav" runat="server" />
-					<asp:Panel ID="pnlEditBar" runat="server" CssClass="pagenavtop">
-						<table>
-							<tr>
-								<td id="tdPageEdit" runat="server"><asp:ImageButton ID="lnkEdit" runat="server" OnClick="lnkEdit_Click" CausesValidation="false" ImageUrl="~/images/icons/edit.gif"/>&nbsp;Edit&nbsp;</td>
-								<td id="tdPageNew" runat="server"><asp:ImageButton ID="lnkNewPage" runat="server" OnClick="lnkNewPage_Click" CausesValidation="false" ImageUrl="~/images/icons/add.gif" />&nbsp;New&nbsp;</td>
-								<td id="tdPageList" runat="server"><asp:ImageButton ID="lnkPageList" runat="server" OnClick="lnkPageList_Click" CausesValidation="false" ImageURL="~/images/icons/addressbook.gif"/>&nbsp;Page List&nbsp;</td>
-							</tr>
-						</table>
-					</asp:Panel>
-					<div class="pagesummary"><%=Summary %>
-						<div id="SiteMapPathWrapper">
-						<asp:SiteMapPath ID="SiteMapPath1" runat="server" Visible="false"></asp:SiteMapPath>
-						</div>
+					<div id="pageTitleBody">
+					    <asp:contentplaceholder id="cphTopNav" runat="server" />
+					    <div id="pageSummary"><%=Summary %>
+						    <div id="SiteMapPathWrapper">
+    						    <asp:SiteMapPath ID="SiteMapPath1" runat="server" Visible="false"></asp:SiteMapPath>
+						    </div>
+					    </div>
+					    <asp:Panel ID="pnlEditBar" runat="server" CssClass="pagenavtop">
+						    <table>
+							    <tr>
+								    <td id="tdPageEdit" runat="server"><asp:ImageButton ID="lnkEdit" runat="server" OnClick="lnkEdit_Click" CausesValidation="false" ImageUrl="~/images/icons/edit.gif"/>&nbsp;Edit&nbsp;</td>
+								    <td id="tdPageNew" runat="server"><asp:ImageButton ID="lnkNewPage" runat="server" OnClick="lnkNewPage_Click" CausesValidation="false" ImageUrl="~/images/icons/add.gif" />&nbsp;New&nbsp;</td>
+								    <td id="tdPageList" runat="server"><asp:ImageButton ID="lnkPageList" runat="server" OnClick="lnkPageList_Click" CausesValidation="false" ImageURL="~/images/icons/addressbook.gif"/>&nbsp;Page List&nbsp;</td>
+							    </tr>
+						    </table>
+					    </asp:Panel>
 					</div>
 				</div>
 				<div class="pagebody"><%=Body %></div>

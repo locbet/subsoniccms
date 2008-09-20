@@ -29,7 +29,7 @@ th a
 {
 	border-style:solid;
 	border-color:#ff9a2d;
-	border-width:1.0em;
+	border-width:1.1em;
 	background:#ff9a2d url(images/bg-menu-main.png) top left repeat-x;
 }
 
@@ -53,6 +53,7 @@ th a
 	display:inline;
     background:#ff9a2d url(images/bg-menu-main.png) repeat-x;
 	margin-bottom:2.0em;
+	margin-top:-.2em;
 }
 
 #main
@@ -86,9 +87,49 @@ th a
 #searchbox
 {
 	float:right;
+	padding-top:.75em;
 	padding-right:1em;
 	clear:right;
 	padding-left:1em;
+	display:inline;
+}
+
+#centercontent
+{
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+#pageTitle
+{
+	float:left;
+	clear:both;
+	padding-top:15px;
+	display:inline;
+	width:100%;
+}
+
+#pageTitleBody
+{
+	float:left;
+	clear:both;
+    padding-top:0px;
+	padding-bottom:15px;
+	display:inline;
+	width:100%;
+}
+
+#pageSummary
+{
+	font-size: 0.9em;
+	color: #000000;
+	bottom: 0;
+	font-style: italic;
+	font-family: arial;
+	margin-bottom:15px;
+	float:left;
+	clear:left;
+	padding-top: 0.7em;
 	display:inline;
 }
 
@@ -150,15 +191,6 @@ h1
 	font-weight:700;
 }
 
-/*
-h1.pagetitle
-{
-	float:left;
-	clear:both;
-	padding-top:15px;
-	display:inline;
-}
-*/
 h2 {
 	color: #ff9a2d;
 	font-size: 1.25em;
@@ -226,20 +258,6 @@ textarea
     font-family: 'Lucida Sans';
     border:1px solid #c5c5c5;
     width:100%;
-}
-
-.pagesummary
-{
-	font-size: 0.9em;
-	color: #000000;
-	bottom: 0;
-	font-style: italic;
-	font-family: arial;
-	margin-bottom:15px;
-	float:left;
-	clear:left;
-	padding-top: 0.7em;
-	display:inline;
 }
 
 .pagenavtop
@@ -350,7 +368,6 @@ textarea
 {
 	color: Red;
 	font-family: arial;
-	font-weight: bold;
 }
 
 .validationSummaryError
@@ -359,7 +376,6 @@ textarea
 	padding-top: 1em;
 	bottom: 0;
 	font-family: arial;
-	font-weight: bold;
 	background-image:url(../../images/icons/icon_error.gif);
 	background-repeat:no-repeat;
 	background-position:left;
@@ -372,7 +388,6 @@ textarea
 {
 	color: Green;
 	font-family: arial;
-	font-weight: bold;
 }
 
 .validationSummarySuccess
@@ -381,7 +396,6 @@ textarea
 	padding-top: 1em;
 	bottom: 0;
 	font-family: arial;
-	font-weight: bold;
 	background-image:url(../../images/icons/icon_check.gif);
 	background-repeat:no-repeat;
 	background-position:left;
