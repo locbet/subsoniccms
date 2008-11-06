@@ -29,11 +29,11 @@ public partial class admin_users : BasePage
 
 		try
 		{
-			ResultMessage1.ShowSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
+			OnPageSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to change account approval status.", ex);
+			OnPageError("Unable to change account approval status.", ex);
 		}
     }
 
@@ -74,7 +74,7 @@ public partial class admin_users : BasePage
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to perform the search.", ex);
+			OnPageError("Unable to perform the search.", ex);
 		}
 
     }
@@ -88,11 +88,11 @@ public partial class admin_users : BasePage
 			{
 				SiteUtility.DeleteUser(userName);
 				updateGrid();
-				ResultMessage1.ShowSuccess(userName + " was successfully deleted.");
+				OnPageSuccess(userName + " was successfully deleted.");
 			}
 			catch (Exception ex)
 			{
-				ResultMessage1.ShowFail(userName + " could not be deleted. ", ex);
+				OnPageError(userName + " could not be deleted. ", ex);
 			}
         }
     }

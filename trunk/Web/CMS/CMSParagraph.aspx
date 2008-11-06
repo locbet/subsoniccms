@@ -1,5 +1,11 @@
 <%@ Page validaterequest="false" Language="C#" AutoEventWireup="true" CodeFile="CMSParagraph.aspx.cs" Inherits="CMSParagraph" %>
 <%@ OutputCache  NoStore="true" Location="None"%>
+
+<head id="Head1" runat="server">
+	<link href="../../App_Themes/Default/Default.css" type="text/css" />
+	<title></title>
+</head>
+<body>
 <form id="elForm" runat="server">
 <div style="float:left;clear:none;margin:10px;">
     <div>
@@ -15,3 +21,4 @@
     </div>
 </div> 
 </form>
+</body>

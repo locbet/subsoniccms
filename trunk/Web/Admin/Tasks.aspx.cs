@@ -17,7 +17,14 @@ public partial class admin_tasks : BasePage
     {
 		if (!Page.IsPostBack)
 		{
-			loadAll();
+			try
+			{
+				loadAll();
+			}
+			catch (Exception ex)
+			{
+				OnPageError("Unable to load tasks", ex);
+			}
 		}
 	}
 

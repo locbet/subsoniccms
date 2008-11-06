@@ -31,10 +31,10 @@
 		<div id="loginview">
 			<asp:LoginView ID="elLog" runat="server">
 				<AnonymousTemplate>
-				<a href='<%=Page.ResolveUrl("~/login.aspx")%>' class="headlinks">Login</a> 
+				<a href='<%= SiteUtility.LoginUrl() %>' class="headlinks">Login</a> 
 			   </AnonymousTemplate>
 				<LoggedInTemplate>
-				 <span class="headlinks">Welcome Back <%= Page.User.Identity.Name.ToString() %>!</span> | <asp:LinkButton ID="lnkLogout" runat="server" OnClick="lnkLogout_Click1" CssClass="headlinks" CausesValidation="false">Logout</asp:LinkButton>
+				 <span class="headlinks"><%= SiteUtility.UserLoginMessage() %></span> | <asp:LinkButton ID="lnkProfile" runat="server" OnClick="lnkProfile_Click" CssClass="headlinks" CausesValidation="false">Profile</asp:LinkButton> | <asp:LinkButton ID="lnkLogout" runat="server" OnClick="lnkLogout_Click1" CssClass="headlinks" CausesValidation="false">Logout</asp:LinkButton>
 				</LoggedInTemplate>
 			</asp:LoginView>
 		</div>
@@ -58,8 +58,11 @@
 		
 		<asp:Panel ID="PNL_PageHeader" runat="server" Visible="true" CssClass="pageheader">
 			<div id="pageheader">
-				<asp:contentplaceholder  id="cphMessageBar" runat="server">
-				</asp:contentplaceholder>
+				<asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Always">
+					<ContentTemplate>
+						<cms:ResultMessage ID="ResultMessage1" runat="server" />
+					</ContentTemplate>
+				</asp:UpdatePanel>
 				<div>
 					<div>
 						<h1 id="pageTitle"><%=Title %></h1>

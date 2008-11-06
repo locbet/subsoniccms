@@ -42,7 +42,7 @@ public partial class Modules_ContentManager_ResultMessage : BaseUserControl
 
 		if (ex != null)
 		{
-			new WebEvents.InputValidationEvent(this.Page, message + "\r\n" + ex.Message).Raise();
+			new WebEvents.InputValidationEvent(this.Page, message + "\r\n" + ex.Message, ex).Raise();
 		}
 	}
 

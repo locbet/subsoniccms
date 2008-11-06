@@ -2,8 +2,6 @@
 <%@ MasterType virtualpath="~/site.master" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphBody" Runat="Server">
-<cms:ResultMessage ID="ResultMessage1" runat="server" />
-
 <div id="centercontent">
 <br />
     <div style="padding-bottom:5px" >

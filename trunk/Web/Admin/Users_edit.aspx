@@ -5,9 +5,6 @@
 
 <table style="width:100%;padding:0;border:0">
 <tr>
-	<td><cms:ResultMessage ID="ResultMessage1" runat="server" /></td>
-</tr>
-<tr>
    <td><h1><asp:literal ID="ActionTitle" runat="server" text="Edit User" /></h1></td>
 </tr>
 <tr>

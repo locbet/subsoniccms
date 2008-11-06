@@ -7,6 +7,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using System.Web.Profile;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// A class for you to use as needed; extend's SubSonic's core utility set
@@ -31,6 +33,30 @@ public class SiteUtility:SubSonic.Utilities.Utility
         public const string USER_SEARCH_REGEX = "[0-9a-zA-z][0-9a-zA-Z\\s-]+";
     }
 
+	public const string URL_FOUR_O_FOUR = "~/view/not-found.aspx";
+
+	public static string UserLoginMessage()
+	{
+		//set any additional profile values here
+		ProfileBase p = ProfileBase.Create(HttpContext.Current.User.Identity.Name.ToString());
+		if (p == null)
+		{
+			return String.Concat("Welcome Back ", HttpContext.Current.User.Identity.Name.ToString(), "!");
+		}
+		else
+			return String.Concat("Hi ", p.GetPropertyValue("FirstName") , "!");
+
+	}
+
+	public static string LoginUrl()
+	{
+		return ResolveUrl("~/login.aspx?ReturnURL=" + HttpContext.Current.Request.Url.PathAndQuery);
+	}
+
+	public static string UserID()
+	{
+		return HttpContext.Current.User.Identity.Name;
+	}
     public static bool UserIsAdmin()
 	{
 		return HttpContext.Current.User.IsInRole(SiteRoles.ADMINISTRATOR_ROLE);
@@ -85,7 +111,7 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		}
 		catch (Exception ex)
 		{
-			throw new Exception("Unable to update role membership. <br />" + ex.Message, ex);
+			throw new Exception("Unable to update role membership.", ex);
 		}
 	}
 
@@ -101,6 +127,7 @@ public class SiteUtility:SubSonic.Utilities.Utility
 
     public static bool IsUserInRole(string u, string role)
 	{
+		role = role.Trim();
         if (string.IsNullOrEmpty(u) ||
             string.IsNullOrEmpty(role))
         {
@@ -165,8 +192,37 @@ public class SiteUtility:SubSonic.Utilities.Utility
 		{
 			new WebEvents.LogoutSuccessEvent(HttpContext.Current, HttpContext.Current.User.Identity.Name.ToString()).Raise();
 			FormsAuthentication.SignOut();
-			HttpContext.Current.Response.Redirect("~/default.aspx", false);
+			Redirect("~/default.aspx");
 		}
+	}
+	public static void Redirect(int responseCode)
+	{
+		Redirect(responseCode, String.Empty);
+	}
+
+	public static void Redirect(string newUrl)
+	{
+		Redirect(0, newUrl);
+	}
+
+	public static void Redirect(int responseCode, string returnUrl)
+	{
+		string newUrl = "";
+		switch (responseCode)
+		{
+			case 403:
+				newUrl = String.Concat("~/login.aspx", (!String.IsNullOrEmpty(returnUrl) ? "?ReturnUrl=" + HttpContext.Current.Server.HtmlEncode(returnUrl) : ""));
+				new WebEvents.PageAccessFailureEvent(HttpContext.Current, HttpContext.Current.User.Identity.Name, HttpContext.Current.Request.Url.PathAndQuery).Raise();
+				break;
+			case 404:
+				newUrl = URL_FOUR_O_FOUR;
+				new WebEvents.PageAccessFailureEvent(HttpContext.Current, HttpContext.Current.User.Identity.Name, HttpContext.Current.Request.Url.PathAndQuery).Raise();
+				break;
+			default:
+				newUrl = returnUrl;
+				break;
+		}
+		HttpContext.Current.Response.Redirect(newUrl, true);
 	}
 	public static void BuildBasePage(BasePage thisBase, BaseMasterPage thisMaster, string pageUrl)
 	{
@@ -174,6 +230,8 @@ public class SiteUtility:SubSonic.Utilities.Utility
         CMS.Page thisPage = new CMS.Page();
 		try
 		{
+			if (!pageUrl.ToLower().EndsWith(".aspx"))
+				pageUrl = pageUrl + ".aspx";
 
             thisPage = CMS.ContentService.GetPage(pageUrl);
 			if (thisPage == null || thisPage.PageID == 0)
@@ -181,7 +239,7 @@ public class SiteUtility:SubSonic.Utilities.Utility
 				thisPage = new CMS.Page();
                 throw new CMS.PageNotFoundException();
 			}
-            else if (pageUrl != "notfound.aspx" && pageUrl != "login.aspx" && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.ViewRoles.Split(new char[] { ',', ';' }, 512)) && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.EditRoles.Split(new char[] { ',', ';' }, 512)))
+            else if (pageUrl != "not-found.aspx" && pageUrl != "login.aspx" && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.ViewRoles.Split(new char[] { ',', ';' }, 512)) && !IsUserInRole(HttpContext.Current.User.Identity.Name, thisPage.EditRoles.Split(new char[] { ',', ';' }, 512)))
             {
                 throw new CMS.PageNotAuthorizedException();
             }
@@ -217,5 +275,106 @@ public class SiteUtility:SubSonic.Utilities.Utility
         }
         thisMaster.thisPage = thisPage;
 		return;
+	}
+
+	/// <summary>
+	/// grabbed this from Rick Strahl's most excellent blog:
+	/// http://www.west-wind.com/Weblog/posts/154812.aspx
+	/// Returns a site relative HTTP path from a partial path starting out with a ~.
+	/// Same syntax that ASP.Net internally supports but this method can be used
+	/// outside of the Page framework.
+	/// 
+	/// Works like Control.ResolveUrl including support for ~ syntax
+	/// but returns an absolute URL.
+	/// </summary>
+	/// <param name="originalUrl">Any Url including those starting with ~</param>
+	/// <returns>relative url</returns>
+	public static string ResolveUrl(string originalUrl)
+	{
+		if (originalUrl == null)
+			return null;
+
+		// *** Absolute path - just return
+		if (originalUrl.IndexOf("://") != -1)
+			return originalUrl;
+
+		// *** Fix up image path for ~ root app dir directory
+		if (originalUrl.StartsWith("~"))
+		{
+			string newUrl = "";
+			if (HttpContext.Current != null)
+				newUrl = HttpContext.Current.Request.ApplicationPath +
+					  originalUrl.Substring(1).Replace("//", "/");
+			else
+				// *** Not context: assume current directory is the base directory
+				throw new ArgumentException("Invalid URL: Relative URL not allowed.");
+
+			// *** Just to be sure fix up any double slashes
+			return newUrl;
+		}
+
+		return originalUrl;
+	}
+
+	/// <summary>
+	/// This method returns a fully qualified absolute server Url which includes
+	/// the protocol, server, port in addition to the server relative Url.
+	/// 
+	/// Works like Control.ResolveUrl including support for ~ syntax
+	/// but returns an absolute URL.
+	/// </summary>
+	/// <param name="ServerUrl">Any Url, either App relative or fully qualified</param>
+	/// <param name="forceHttps">if true forces the url to use https</param>
+	/// <returns></returns>
+	public static string ResolveServerUrl(string serverUrl, bool forceHttps)
+	{
+		// *** Is it already an absolute Url?
+		if (serverUrl.IndexOf("://") > -1)
+			return serverUrl;
+		// *** Start by fixing up the Url an Application relative Url
+		string newUrl = ResolveUrl(serverUrl);
+		Uri originalUri = HttpContext.Current.Request.Url;
+		newUrl = (forceHttps ? "https" : originalUri.Scheme) +
+				 "://" + originalUri.Authority + newUrl;
+		return newUrl;
+	}
+
+	/// <summary>
+	/// This method returns a fully qualified absolute server Url which includes
+	/// the protocol, server, port in addition to the server relative Url.
+	/// 
+	/// It work like Page.ResolveUrl, but adds these to the beginning.
+	/// This method is useful for generating Urls for AJAX methods
+	/// </summary>
+	/// <param name="ServerUrl">Any Url, either App relative or fully qualified</param>
+	/// <returns></returns>
+	public static string ResolveServerUrl(string serverUrl)
+	{
+		return ResolveServerUrl(serverUrl, false);
+	}
+
+	/// <summary>
+	///remove the first section of the absolute path, 
+	///which is presented like /sitename/somefile.aspx
+	/// </summary>
+	/// <param name="url"></param>
+	/// <returns></returns>
+	public static string RemoveRootFromUrl(string url)
+	{
+		string baseUrl = SiteUtility.ResolveUrl("~");
+		//new WebEvents.InputValidationEvent(HttpContext.Current, "BaseUrl for " + url + " is " + baseUrl).Raise();
+		if (url.StartsWith(baseUrl))
+		{
+			//new WebEvents.InputValidationEvent(HttpContext.Current, "Replacing " + baseUrl + " in " + url).Raise();
+			Regex re = new Regex(baseUrl);
+			url = re.Replace(url, "", 1);
+		}
+		if (url.StartsWith("/"))
+		{
+			Regex re = new Regex("/+");
+			url = re.Replace(url, "", 1);
+			//new WebEvents.InputValidationEvent(HttpContext.Current, "Replaced / in url, left with " + url).Raise();
+		}
+		return url;
 	}
 }

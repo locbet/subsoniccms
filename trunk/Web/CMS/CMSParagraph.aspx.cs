@@ -62,6 +62,6 @@ public partial class CMSParagraph : BasePage
         text.ContentName = ContentName;
         text.Body = txtContent.Value;
         text.Save(Page.User.Identity.Name);
-        ResultMessage1.ShowSuccess("Content Saved");
+        OnPageSuccess("Content Saved");
     }
 }

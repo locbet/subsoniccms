@@ -418,21 +418,6 @@ textarea
 	background-color:Transparent;
 }
 
-.NewReferralNavTop
-{
-	float:right;
-	padding-right:1em;
-	display:inline;
-}
-
-.NewReferralNavBottom
-{
-	float:right;
-	display:inline;
-	padding-right:1em;
-	font-weight:700;
-}
-
 .lblHeaderNavText
 {
 	font-size:0.8em;
@@ -503,6 +488,13 @@ textarea
 {
 	font-style:italic;
 }
+
+.searchDescription a
+{
+	font-style:normal;
+	font-size:smaller;
+}
+
 .searchDescriptionAlt
 {
 	font-style:italic;
@@ -730,71 +722,71 @@ textarea
 	color:Black;
 }
 
-
-/* ROUNDED CORNERS */
-div.rounded {
-    clear:both;
-    max-width:2400px;
-    margin:5px auto;
-    width:95%;
+.pnlEdit 
+{
 }
 
-div.rounded div.top {
-    background:url(images/topLeft.png) no-repeat bottom left;
-    padding:0px;
-    width:100%;
+.pnlEdit p
+{
+	margin: 1em 0em 1em 0em;
 }
 
-div.rounded div.top div.right {
-    background:url(images/topRight.png) no-repeat bottom right;
-    height:12px;
-    margin-left:12px;
+/* Ajax Control Toolkit DropDown */
+.ContextMenuPanel 
+{
+	border: 1px solid #868686;
+	z-index: 1000;
+	background: url(images/dropdownmenu-bg.gif) repeat-y 0 0 #FAFAFA;
+	cursor: default;
+	padding: 1px 1px 0px 1px;
+	font-size: 11px;
 }
 
-div.rounded div.middle {
-    background:url(images/left.png) repeat-y left;
-    clear:both;
-    width:100%;
+.ContextMenuBreak
+{
+	margin:1px 1px 1px 32px;
+	padding:0;
+	height:1px;
+	overflow:hidden;
+	display:block;
+	border-top: 1px solid #C5C5C5;	
 }
 
-div.rounded div.middle div.right {
-    background:url(images/right.png) repeat-y right;
-    margin-left:5px;
+a.ContextMenuItem
+{
+	margin: 1px 0 1px 0;
+	display: block;
+	color: #003399;
+	text-decoration: none;
+	cursor: pointer;	
+	padding: 4px 19px 4px 33px;
+	white-space: nowrap;
 }
 
-div.rounded div.middle div.right div.content {
-    background:url(images/bg.png) repeat top left;
-    color:#fff;
-    font-family:"Trebuchet MS", Calibri, Tahoma, sans-serif;
-    font-size:1.0em;
-    line-height:1.3em;
-    margin-right:5px;
-    padding:0px 7px;
-    text-align:justify;
+a.ContextMenuItem-Selected
+{
+	font-weight: bold;
 }
 
-div.rounded div.middle div.right div.content p {
-    margin:0px;
-    padding-top:15px;
+a.ContextMenuItem:hover
+{
+	background-color: #FFE6A0;
+	color: #003399;
+	border: 1px solid #D2B47A;
+	padding: 3px 18px 3px 32px;
 }
 
-div.rounded div.middle div.right div.content h2 {
-    color:#0f2;
-    font-size:1.75em;
-    font-weight:bold;
-    margin:0px;
-    padding:7px 0px;
+.ContextMenuPanelLabel
+{
+	padding:2px; 
+	padding-right: 50px; 
+	font-family: Tahoma; 
+	font-size: 11px; 
+	color:Black; 
+	font-weight:bold;
 }
 
-div.rounded div.bottom {
-    background:url(images/bottomLeft.png) no-repeat top left;
-    clear:both;
-    padding:0px;
-    width:100%;
-}
-
-div.rounded div.bottom div.right {
-    background:url(images/bottomRight.png) no-repeat top right;
-    height:12px;
-    margin-left:12px;
+.ContextMenuPanel span label
+{
+	padding-left:10px;
 }

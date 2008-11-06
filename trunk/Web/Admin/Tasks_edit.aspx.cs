@@ -67,7 +67,7 @@ public partial class admin_task_edit : BasePage
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to load this task completely.", ex);
+			OnPageError("Unable to load this task completely.", ex);
 		}
 	}
 
@@ -156,7 +156,7 @@ public partial class admin_task_edit : BasePage
                     t.Save();
                     t.Close();
                     LoadTriggers(new ReadOnlyTask(taskName));
-                    ResultMessage1.ShowSuccess("Trigger successfully deleted.");
+                    OnPageSuccess("Trigger successfully deleted.");
                 }
 				break;
 		}
@@ -167,11 +167,11 @@ public partial class admin_task_edit : BasePage
 		try
 		{
 			SaveTask(sender, e);
-			Response.Redirect("~/admin/tasks_edit.aspx?taskname=" + taskName);
+			SiteUtility.Redirect("~/admin/tasks_edit.aspx?taskname=" + Server.UrlPathEncode(taskName));
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to save task", ex);
+			OnPageError("Unable to save task", ex);
 		}
     }
 

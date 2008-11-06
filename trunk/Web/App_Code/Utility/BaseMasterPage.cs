@@ -1,6 +1,10 @@
 /// <summary>
 /// Base Master Page for all Start Site user controls
 /// </summary>
+using System;
+using System.Text;
+using System.Collections.Generic;
+
 public class BaseMasterPage : System.Web.UI.MasterPage
 {
     private string _Title = "";
@@ -63,5 +67,36 @@ public class BaseMasterPage : System.Web.UI.MasterPage
         ShowEditLinks = _thisPage.ShowEditLinks;
     }
 
-}
+	public virtual void OnPageError(string message)
+	{
+		Response.Write(message);
+	}
 
+	public virtual void OnPageError(string message, Exception ex)
+	{
+		Response.Write(message);
+		if (SiteUtility.UserIsAdmin() && ex != null)
+			Response.Write(ex.Message);
+	}
+
+	///GCS-689: Support display of a list of errors in OnPageError
+	public virtual void OnPageError(IList<string> list, Exception ex)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.Append("<ul>");
+		foreach (string s in list)
+		{
+			sb.Append("<li>");
+			sb.Append(s);
+			sb.Append("</li>");
+		}
+		sb.Append("</ul>");
+		OnPageError(sb.ToString(), ex);
+	}
+
+	public virtual void OnPageSuccess(string message)
+	{
+		Response.Write(message);
+	}
+
+}
