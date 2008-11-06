@@ -1,14 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="~/site.master" AutoEventWireup="true" CodeFile="Tasks_edit.aspx.cs" Inherits="admin_task_edit" Title="Edit Task" %>
 <%@ MasterType virtualpath="~/site.master" %>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="cphMessageBar" Runat="Server">
-<asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Always">
-<ContentTemplate>
-	<cms:ResultMessage ID="ResultMessage1" runat="server" />
-</ContentTemplate>
-</asp:UpdatePanel>
-</asp:Content>
-
 <asp:Content ID="Content1" ContentPlaceHolderID="cphBody" Runat="Server">
 <asp:UpdatePanel runat="server" UpdateMode="Conditional"><ContentTemplate>
 <table style="width:100%;padding:0;border:0">

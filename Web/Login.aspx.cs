@@ -10,7 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using SubSonic.Utilities;
 
-public partial class Login : BasePage
+public partial class Site_Login : BasePage
 {
 	protected void Page_Load(object sender, EventArgs e)
     {
@@ -25,9 +25,9 @@ public partial class Login : BasePage
     protected void NewRegistration(object sender, EventArgs e) {
         string redir = Utility.GetParameter("ReturnUrl");
         if (redir != string.Empty) {
-			Response.Redirect(redir, false);
+			SiteUtility.Redirect(redir);
         } else {
-			Response.Redirect("default.aspx", false);
+			SiteUtility.Redirect("default.aspx");
         }
     }
 }

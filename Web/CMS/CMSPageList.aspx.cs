@@ -30,7 +30,7 @@ public partial class Admin_CMSPageList : BasePage
 					CMS.Page p = CMS.ContentService.GetPage(pageID);
 					if (p.IsLoaded && p.PageUrl != "")
 					{
-						Response.Redirect("~/view/editpage.aspx?pRef=" + p.PageUrl);
+						SiteUtility.Redirect("~/view/editpage.aspx?pRef=" + p.PageUrl);
 					}
 				}
 				break;
@@ -41,7 +41,7 @@ public partial class Admin_CMSPageList : BasePage
 					CMS.Page p = CMS.ContentService.GetPage(pageID);
 					if (p.IsLoaded && p.PageUrl != "")
 					{
-						Response.Redirect((p.PageTypeID == 1 ? "~/" : "~/view/") + p.PageUrl);
+						SiteUtility.Redirect((p.PageTypeID == 1 ? "~/" : "~/view/") + p.PageUrl);
 					}
 				}
 				break;

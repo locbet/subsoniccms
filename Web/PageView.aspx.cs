@@ -31,7 +31,6 @@ public partial class PageView : BasePage
         string pageUrl = SubSonic.Utilities.Utility.GetParameter("p");
         if (pageUrl != "newpage.aspx" && pageUrl != "editpage.aspx")
         {
-            BuildBasePage(pageUrl);
             ToggleEditor(false);
         }
         else if (SiteUtility.UserCanEdit())
@@ -39,22 +38,19 @@ public partial class PageView : BasePage
             switch (pageUrl)
             {
                 case "newpage.aspx":
-                    this.BuildBasePage("view/newpage.aspx");
                     SetupNewPage();
                     break;
                 case "editpage.aspx":
-                    string pageRef = SubSonic.Utilities.Utility.GetParameter("pRef");
-                    this.BuildBasePage(pageRef);
                     LoadEditor();
                     break;
                 default:
-                    Response.Redirect("~/default.aspx");
+				SiteUtility.Redirect("~/");
                     break;
             }
         }
         else
         {
-            Response.Redirect("~/login.aspx");
+		SiteUtility.Redirect(403);
         }
     }
 
@@ -78,7 +74,6 @@ public partial class PageView : BasePage
 	void ToggleEditor(bool showIt)
 	{
         pnlEdit.Visible = showIt;
-        pnlPublic.Visible = !showIt;
     }
 
     void LoadEditor() {
@@ -112,9 +107,6 @@ public partial class PageView : BasePage
 		LoadPageTypes();
         ddlEditRoles.SelectedValue = (thisPage.EditRoles == "*" ? "-1" : (thisPage.EditRoles == "+" ? "0" : "1"));
         ddlViewRoles.SelectedValue = (thisPage.ViewRoles == "*" ? "-1" : (thisPage.ViewRoles == "+" ? "0" : "1"));
-        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlEditRoles.ClientID, "toggleRoleItems('" + ddlEditRoles.ClientID + "','divEditRoles')");
-        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlViewRoles.ClientID, "toggleRoleItems('" + ddlViewRoles.ClientID + "','divEditRoles')");
-        //ClientScript.RegisterStartupScript(typeof(String), "js" + ddlPageType.ClientID, "togglePageTypeItems('" + ddlPageType.ClientID + "')");
     }
 
     #endregion
@@ -122,7 +114,7 @@ public partial class PageView : BasePage
     #region Button Events
 
     protected void btnCancel_Click(object sender, EventArgs e) {
-        Response.Redirect((Master.thisPage.PageUrl != "" ? "~/view/" + Master.thisPage.PageUrl : "~/default.aspx"));
+        SiteUtility.Redirect((Master.thisPage.PageUrl != "" ? "~/view/" + Master.thisPage.PageUrl : "~/default.aspx"));
     }
     protected void btnSave_Click(object sender, EventArgs e) {
 
@@ -159,6 +151,7 @@ public partial class PageView : BasePage
             foreach (string s in roles)
             {
                 ListItem item = new ListItem(s);
+				item.Attributes.Add("onclick", "filterRoleClick(event)");
                 cbl.Items.Add(item);
             }
 
@@ -328,12 +321,12 @@ public partial class PageView : BasePage
             ResetSiteMap();
         } catch (Exception x){
             haveError = true;
-            ResultMessage1.ShowFail(x.Message);
+            OnPageError("Error saving the page.", x);
         }
         //redirect to it
 		if (!haveError)
 		{
-			Response.Redirect((thisPage.PageTypeID == 1 ? "" : "~/view/") + thisPage.PageUrl);
+			SiteUtility.Redirect((thisPage.PageTypeID == 1 ? thisPage.PageUrl.Replace("default.aspx","") : "~/view/") + thisPage.PageUrl.Replace(".aspx",""));
 		}
     }
     
@@ -372,14 +365,14 @@ public partial class PageView : BasePage
             CMS.ContentService.DeletePage(Master.thisPage.PageID);
             this.ResetSiteMap();
         } catch (Exception x) {
-            ResultMessage1.ShowFail(x.Message);
+            OnPageError("Unable to delete page.", x);
             haveError = true;
             ToggleEditor(true);
         }
 		if (!haveError)
 		{
 			//some users won't be able to see this screen, so they will be redirected to the login.
-			Response.Redirect("~/cms/cmspagelist.aspx");
+			SiteUtility.Redirect("~/cms/cmspagelist.aspx");
 		}
     }
 
@@ -396,7 +389,7 @@ public partial class PageView : BasePage
             ResetSiteMap();
 
         } catch (Exception x) {
-            ResultMessage1.ShowFail(x.Message);
+            OnPageError("Unable to reset parent page.", x);
         }
 
     }

@@ -27,6 +27,25 @@ professional.
 	Namespace="SubSonic" 
 	TagPrefix="subsonic" %>
 
+<asp:DetailsView runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+    <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <CommandRowStyle BackColor="#FFFFC0" Font-Bold="True" />
+    <RowStyle CssClass="GridCell1"/>
+    <FieldHeaderStyle CssClass="thRowScope" />
+    <PagerStyle BackColor="#FFCC66" ForeColor="#333333" HorizontalAlign="Center" />
+    <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <AlternatingRowStyle CssClass="GridCell2"/>
+</asp:DetailsView>
+
+<asp:DetailsView SkinID="LogDetail" runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+    <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <CommandRowStyle BackColor="#FFFFC0" Font-Bold="True" />
+    <RowStyle BackColor="#FFFBD6" ForeColor="#333333" />
+    <PagerStyle BackColor="#FFCC66" ForeColor="#333333" HorizontalAlign="Center" />
+    <FieldHeaderStyle BackColor="#FFFF99" Font-Bold="True" />
+    <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <AlternatingRowStyle BackColor="White" />
+</asp:DetailsView>
 
 <asp:GridView SkinId="dvDestinationSelection" runat="server" Style="border-right: gainsboro 1px solid;
     border-top: gainsboro 1px solid; font-size: 8pt; border-left: gainsboro 1px solid;
@@ -88,7 +107,11 @@ professional.
 <asp:TextBox SkinID="comments" runat="server" style="width:40em;height:4.5em;" Wrap="true" />
 <asp:DropDownList SkinID="destination" runat="server" style="width:300px"/>
 <asp:TextBox SkinID="accountNumber" runat="server" style="width:300px"/>
-<subsonic:DropDown runat="server" style="width:200px"/>
+<asp:Panel runat="server"
+    SkinID="ContextMenuPanel"
+    Style="display: none; visibility: hidden;"
+    CssClass="ContextMenuPanel" />
+
 
 
 <%-- AJAX Controls --%>
@@ -100,7 +123,7 @@ professional.
     CollapsedText="(show details...)"
     SuppressPostBack="true" />
 <ajax:ListSearchExtender runat="server" PromptPosition="Top" PromptCssClass="ListSearchPromptText" />
-
+<ajax:DropDownExtender runat="server" DropArrowBackColor="DarkGray" HighlightBorderColor="black" HighlightBackColor="#ff9a2d"/>
 
 <%-- Site Menu Control --%>
 <asp:Menu runat="server"
@@ -130,3 +153,8 @@ professional.
 <asp:ValidationSummary runat="server" CssClass="validationSummaryError"></asp:ValidationSummary>
 <asp:RequiredFieldValidator runat="server" CssClass="validationError"></asp:RequiredFieldValidator>
 <asp:CustomValidator runat="server" CssClass="validationError"></asp:CustomValidator>
+	
+<%-- SubSonic Controls --%>
+<subsonic:CalendarControl runat="server" ShowTime="true" Width="120px" />
+<subsonic:CalendarControl runat="server" ShowTime="false" Width="60px" SkinID="calShort" />
+<subsonic:DropDown runat="server" style="width:200px"/>

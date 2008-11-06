@@ -40,11 +40,11 @@ public partial class admin_roles : BasePage
 				Roles.DeleteRole(roleName, true);
 				new WebEvents.RemoveRolesSuccessEvent(this, roleName).Raise();
 				updateGrid();
-				ResultMessage1.ShowSuccess(roleName + " was successfully deleted.");
+				OnPageSuccess(roleName + " was successfully deleted.");
 			}
 			catch (Exception ex)
 			{
-				ResultMessage1.ShowFail("Unable to delete role. ", ex);
+				OnPageError("Unable to delete role. ", ex);
 			}
 		}
 
@@ -55,11 +55,11 @@ public partial class admin_roles : BasePage
 			{
 				SiteUtility.DeleteUser(userName);
 				updateGrid();
-				ResultMessage1.ShowSuccess(userName + " was successfully deleted.");
+				OnPageSuccess(userName + " was successfully deleted.");
 			}
 			catch (Exception ex)
 			{
-				ResultMessage1.ShowFail(userName + " could not be deleted.", ex);
+				OnPageError(userName + " could not be deleted.", ex);
 			}
 		}
 
@@ -73,11 +73,11 @@ public partial class admin_roles : BasePage
 				Roles.CreateRole(roleName);
 				new WebEvents.AddRolesSuccessEvent(this, roleName).Raise();
 				updateGrid();
-				ResultMessage1.ShowSuccess(roleName + " was successfully added.");
+				OnPageSuccess(roleName + " was successfully added.");
 			}
 			catch (Exception ex)
 			{
-				ResultMessage1.ShowFail("Unable to add role.", ex);
+				OnPageError("Unable to add role.", ex);
 			}
         }
     }
@@ -118,11 +118,11 @@ public partial class admin_roles : BasePage
 
 		try
 		{
-			ResultMessage1.ShowSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
+			OnPageSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to change account approval status.", ex);
+			OnPageError("Unable to change account approval status.", ex);
 		}
 	}
 

@@ -99,7 +99,7 @@ public partial class Modules_ContentManager_FlashMessage : System.Web.UI.UserCon
         UpdatePanel up = (UpdatePanel)GetParentOfType(lblMessage, typeof(UpdatePanel));
 
 
-        if (sm != null && up != null)
+        if (sm != null && up != null && Page.IsPostBack)
 		{
             //The user control is nested in an update panel, register the javascript with the script manager and
             //attach it to the update panel in order to fire it after the async postback

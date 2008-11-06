@@ -222,11 +222,11 @@ public partial class admin_user_edit : BasePage
 			{
 				ResetSiteMap();
 			}
-            ResultMessage1.ShowSuccess("User details were successfully updated" + (!allowed ? ", <span class=\"validationError\">except for role memberships. You can't change your own roles -- you must ask another administrator to do that for you.</span>" : "."));
+            OnPageSuccess("User details were successfully updated" + (!allowed ? ", <span class=\"validationError\">except for role memberships. You can't change your own roles -- you must ask another administrator to do that for you.</span>" : "."));
         }
         catch (Exception ex)
         {
-            ResultMessage1.ShowFail("Failed to update user details. ", ex);
+            OnPageError("Failed to update user details. ", ex);
         }
     }
 
@@ -289,11 +289,11 @@ public partial class admin_user_edit : BasePage
 
             SaveButton.Enabled = false;
 
-            ResultMessage1.ShowSuccess("User has been successfully created.");
+            OnPageSuccess("User has been successfully created.");
         }
         catch (Exception ex)
         {
-            ResultMessage1.ShowFail("Failed to create new user. ", ex);
+            OnPageError("Failed to create new user. ", ex);
 			SaveButton.Enabled = false;
 		}
     }
@@ -310,11 +310,11 @@ public partial class admin_user_edit : BasePage
 		{
 			MembershipUser mu = Membership.GetUser(UserID.Text);
 			mu.ResetPassword();
-			ResultMessage1.ShowSuccess("User password has been reset. User will receive an email with the new password");
+			OnPageSuccess("User password has been reset. User will receive an email with the new password");
 		}
 		catch(Exception ex)
 		{
-			ResultMessage1.ShowFail("Could not reset user password. ", ex);
+			OnPageError("Could not reset user password. ", ex);
 		}
 	}
 	protected void unlockAccount_Click(object sender, EventArgs e)
@@ -326,7 +326,7 @@ public partial class admin_user_edit : BasePage
 			{
 				Membership.UpdateUser(mu);
 				new WebEvents.AccountUnlockedEvent(this, mu.UserName);
-				ResultMessage1.ShowSuccess("User account unlocked"); 
+				OnPageSuccess("User account unlocked"); 
 			}
 			else
 			{
@@ -335,7 +335,7 @@ public partial class admin_user_edit : BasePage
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Could not unlock user account. ", ex ); 	
+			OnPageError("Could not unlock user account. ", ex ); 	
 		}
 	}
 
@@ -347,11 +347,11 @@ public partial class admin_user_edit : BasePage
 
 		try
 		{
-			ResultMessage1.ShowSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
+			OnPageSuccess(SiteUtility.ToggleUserApprovedStatus(checkBox));
 		}
 		catch (Exception ex)
 		{
-			ResultMessage1.ShowFail("Unable to change account approval status. ", ex);
+			OnPageError("Unable to change account approval status. ", ex);
 		}
 	}
 

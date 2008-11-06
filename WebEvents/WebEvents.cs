@@ -8,9 +8,36 @@ namespace WebEvents
 {
 	public class InputValidationEvent: WebFailureAuditEvent
 	{
+		private Exception _ex;
 		public InputValidationEvent(object sender, string message)
 			: base(message, sender, WebEventCodes.WebExtendedBase + 1)
 		{ }
+
+		public InputValidationEvent(object sender, string message, Exception ex)
+			: base(message, sender, WebEventCodes.WebExtendedBase + 1)
+		{
+			_ex = ex;
+		}
+
+		public override void FormatCustomEventDetails(WebEventFormatter formatter)
+		{
+			base.FormatCustomEventDetails(formatter);
+
+			if (_ex != null)
+			{
+				// Add custom data.
+				formatter.AppendLine("Exception Details:");
+				formatter.IndentationLevel += 1;
+				formatter.AppendLine("Message: " + _ex.Message);
+				formatter.AppendLine("Source: " + _ex.Source);
+				formatter.AppendLine("Trace: " + _ex.StackTrace);
+
+				// Display custom event message.
+				formatter.AppendLine("");
+
+				formatter.IndentationLevel -= 1;
+			}
+		}
 	}
 
 	public class LoginFailureAccountLockedEvent : WebAuthenticationFailureAuditEvent

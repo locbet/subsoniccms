@@ -2,6 +2,8 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -45,7 +47,12 @@ public partial class site : BaseMasterPage
 
 		new WebEvents.LogoutSuccessEvent(this, Page.User.Identity.Name.ToString()).Raise();
 		FormsAuthentication.SignOut();
-         Response.Redirect("~/default.aspx", false);
+        SiteUtility.Redirect("~/login.aspx");
+   }
+
+   protected void lnkProfile_Click(object sender, EventArgs e)
+   {
+	   SiteUtility.Redirect("~/users/profile/edit/" + Page.User.Identity.Name.ToString());
    }
 
 	public void toggleEditPanel(bool showIt)
@@ -65,7 +72,7 @@ public partial class site : BaseMasterPage
    {
 	   //redirect to "newpage.aspx"
 	   //this is a trigger that tells the page to setup for an add
-	   Response.Redirect("~/view/newpage.aspx");
+	   SiteUtility.Redirect("~/view/newpage.aspx");
    }
 
 	protected void lnkEdit_Click(object sender, EventArgs e)
@@ -74,26 +81,50 @@ public partial class site : BaseMasterPage
 	   //this is a trigger that tells the page to setup for an edit
 		if (!String.IsNullOrEmpty(this.thisPage.PageUrl))
 		{
-			Response.Redirect("~/view/editpage.aspx?pRef=" + this.thisPage.PageUrl);
+			SiteUtility.Redirect("~/view/editpage.aspx?pRef=" + this.thisPage.PageUrl);
 		}
 
    }
 
 	protected void lnkPageList_Click(object sender, EventArgs e)
 	{
-		Response.Redirect("~/cms/cmspagelist.aspx");
+		SiteUtility.Redirect("~/cms/cmspagelist.aspx");
 	}
 
 	protected void btnSiteSearch_Click(object sender, EventArgs e)
 	{
-		if (Page.IsValid && SubSonic.Sugar.Validation.IsAlphaNumeric(txtSiteSearch.Text.Trim(), true) && SiteUtility.UserCanSearch())
+		if (Page.IsValid && SiteUtility.UserCanSearch())
 		{
-			Response.Redirect("~/search/" + HttpUtility.UrlEncode(txtSiteSearch.Text.Trim()));
+			SiteUtility.Redirect("~/search/" + HttpUtility.UrlEncode(txtSiteSearch.Text.Trim()));
 		}
-		else
+	}
+	public override void OnPageError(string message)
+	{
+		ResultMessage1.ShowFail(message);
+	}
+
+	public override void OnPageError(string message, Exception ex)
+	{
+		ResultMessage1.ShowFail(message, ex);
+	}
+
+	public override void OnPageError(IList<string> list, Exception ex)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.Append("<ul>");
+		foreach (string s in list)
 		{
-			new WebEvents.InputValidationEvent(this, "Search validation failed.").Raise();
+			sb.Append("<li>");
+			sb.Append(s);
+			sb.Append("</li>");
 		}
+		sb.Append("</ul>");
+		ResultMessage1.ShowFail(sb.ToString(), ex);
+	}
+
+	public override void OnPageSuccess(string message)
+	{
+		ResultMessage1.ShowSuccess(message);
 	}
 
    #endregion
