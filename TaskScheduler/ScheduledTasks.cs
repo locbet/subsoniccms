@@ -9,14 +9,14 @@ using System.Reflection;
 
 namespace TaskScheduler {
 	/// <summary>
-	/// ScheduledTasks represents the a computer's Scheduled Tasks folder.  Using a ScheduledTasks
+	/// ScheduledTaskController represents the a computer's Scheduled Tasks folder.  Using a ScheduledTaskController
 	/// object, you can discover the names of the tasks in the folder and you can open a task
 	/// to work with it.  You can also create or delete tasks.
 	/// </summary>
 	/// <remarks>
-	/// A ScheduledTasks object holds a COM interface that can be released by calling <see cref="Dispose()"/>.
+	/// A ScheduledTaskController object holds a COM interface that can be released by calling <see cref="Dispose()"/>.
 	/// </remarks>
-	public class ScheduledTasks : IDisposable {
+	public class ScheduledTaskController : IDisposable {
 		/// <summary>
 		/// Underlying COM interface.
 		/// </summary>
@@ -32,19 +32,32 @@ namespace TaskScheduler {
 		/// </summary>
 		/// <param name="computer">The remote computer's UNC name, e.g. "\\DALLAS".</param>
 		/// <exception cref="ArgumentException">The Task Scheduler could not be accessed.</exception>
-		public ScheduledTasks(string computer) : this() {
-			its.SetTargetComputer(computer);
+		public ScheduledTaskController(string computer) : this() {
+
+			if (String.IsNullOrEmpty(computer))
+			{
+				LoadLocalTasks();
+			}
+			else
+			{
+				its.SetTargetComputer(computer);
+			}
 		}
 
 		/// <summary>
 		/// Constructor to use Scheduled Tasks of the local computer.
 		/// </summary>
-		public ScheduledTasks() {
-			CTaskScheduler cts = new CTaskScheduler();
-			its = (ITaskScheduler)cts;
+		public ScheduledTaskController() {
+			LoadLocalTasks();
 		}
 
 		// --- Methods ---
+
+		private void LoadLocalTasks()
+		{
+			CTaskScheduler cts = new CTaskScheduler();
+			its = (ITaskScheduler)cts;
+		}
  
 		private string[] GrowStringArray(string[] s, uint n) {
 			string[] sl = new string[s.Length + n];
@@ -143,6 +156,26 @@ namespace TaskScheduler {
 			}
 		}
 
+		/// <summary>
+		/// Consolidated CreateTask/LoadTask method.
+		/// </summary>
+		/// <param name="taskName"></param>
+		/// <param name="createIfNotExists"></param>
+		/// <returns></returns>
+		public Task LoadTask(string taskName, bool createIfNotExists)
+		{
+			Task t;
+
+			t = this.OpenTask(taskName);
+			if (t == null && createIfNotExists)
+			{
+				t = this.CreateTask(taskName);
+			}
+
+			return t;
+		}
+
+
 
 		#region Implementation of IDisposable
 		/// <summary>
@@ -158,181 +191,10 @@ namespace TaskScheduler {
 		// Two Guids for calls to ITaskScheduler methods Activate(), NewWorkItem(), and IsOfType()
 		internal static Guid ITaskGuid;
 		internal static Guid CTaskGuid;
-		static ScheduledTasks() {
+		static ScheduledTaskController() {
 			ITaskGuid = Marshal.GenerateGuidForType(typeof(ITask));
 			CTaskGuid = Marshal.GenerateGuidForType(typeof(CTask));
 		}
-	}
-
-	/// <summary>
-	/// A strong typed collection of ScheduledTasks
-	/// </summary>
-	public class ScheduledTasksCollection : CollectionBase
-	{
-		/// <summary>
-		/// creates a new instance of the ScheduledTasksCollection
-		/// </summary>
-		public ScheduledTasksCollection() { }
-
-		/// <summary>
-		/// Filters an existing collection based on the set criteria. This is an in-memory filter
-		/// </summary>
-		/// <param name="propertyName">Name of the property to compare.</param>
-		/// <param name="items">The list of items to use for matching</param>
-		/// <returns>ScheduledTasksCollection</returns>
-		public ScheduledTasksCollection Filter(string propertyName, IList items)
-		{
-			return Filter(propertyName, items, propertyName, false);
-		}
-
-		/// <summary>
-		/// Filters an existing collection based on the set criteria. This is an in-memory filter
-		/// </summary>
-		/// <param name="propertyName">Name of the property to compare.</param>
-		/// <param name="items">The list of items to use for matching</param>
-		/// <param name="ignoreCase">Ignore case when matching string types</param>
-		/// <returns>ScheduledTasksCollection</returns>
-		public ScheduledTasksCollection Filter(string propertyName, IList items, bool ignoreCase)
-		{
-			return Filter(propertyName, items, propertyName, ignoreCase);
-		}
-
-		/// <summary>
-		/// Filters an existing collection based on the set criteria. This is an in-memory filter
-		/// </summary>
-		/// <param name="propertyName">Name of the property to compare.</param>
-		/// <param name="items">The list of items to use for matching</param>
-		/// <param name="itemsPropertyName">the name of the property to compare from the items list.</param>
-		/// <returns>ScheduledTasksCollection</returns>
-		public ScheduledTasksCollection Filter(string propertyName, IList items, string itemsPropertyName, bool ignoreCase)
-		{
-			for (int i = this.Count - 1; i > -1; i--)
-			{
-				ReadOnlyTask o = this[i];
-				foreach (object item in items)
-				{
-					bool remove = false;
-					System.Reflection.PropertyInfo pi = o.GetType().GetProperty(propertyName);
-					System.Reflection.PropertyInfo pitem = item.GetType().GetProperty(itemsPropertyName);
-					if (pi.CanRead && pitem.CanRead)
-					{
-						object val = pi.GetValue(o, null);
-						object valItem = pitem.GetValue(item, null);
-						if (!val.Equals(valItem))
-						{
-							//case insensitve match for string types
-							if (val.GetType() != typeof(String) || (val.GetType() == typeof(String) && String.Compare(val.ToString(), valItem.ToString(), ignoreCase) != 0))
-								remove = true;
-						}
-					}
-					if (remove)
-					{
-						this.Remove(o);
-						break;
-					}
-				}
-			}
-			return this;
-		}
-
-
-		/// <summary>
-		/// Loads a collection of ReadOnlyTasks
-		/// </summary>
-		/// <returns></returns>
-		public ScheduledTasksCollection Load()
-		{
-			ScheduledTasks st = new ScheduledTasks();
-			string[] taskNames = st.GetTaskNames();
-			// Open each task, dump info to console
-			foreach (string name in taskNames)
-			{
-				try
-				{
-					Task t = st.OpenTask(name);
-					//Console.WriteLine("--> " + name + " ");
-					List.Add(new ReadOnlyTask(t));
-					//t.Close();
-				}
-				catch (Exception ex)
-				{
-					if (!ex.Message.Contains("unknown user name or bad password"))
-						throw ex;
-				}
-			}
-			return this;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public int Add(ReadOnlyTask item)
-		{
-			return List.Add(item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		/// <param name="item"></param>
-		public void Insert(int index, ReadOnlyTask item)
-		{
-			List.Insert(index, item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		public void Remove(ReadOnlyTask item)
-		{
-			List.Remove(item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public bool Contains(ReadOnlyTask item)
-		{
-			return List.Contains(item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public int IndexOf(ReadOnlyTask item)
-		{
-			return List.IndexOf(item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="array"></param>
-		/// <param name="index"></param>
-		public void CopyTo(ReadOnlyTask[] array, int index)
-		{
-			List.CopyTo(array, index);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		public ReadOnlyTask this[int index]
-		{
-			get { return (ReadOnlyTask)List[index]; }
-			set { List[index] = value; }
-		}
-
 	}
 
 }

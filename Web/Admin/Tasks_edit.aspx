@@ -115,6 +115,8 @@
                <td colspan="2">
                     <br />
                     <asp:button runat="server" id="SaveButton" onClick="SaveClick" text="Save" width="100" CssClass="frmbutton"/>
+                    <asp:button runat="server" id="SaveAndRunButton" onClick="SaveAndRunClick" text="Save and Run" width="100" CssClass="frmbutton"/>
+                    <asp:button runat="server" id="DeleteButton" onClick="DeleteClick" text="Delete" width="100" CssClass="frmbutton" Enabled="false"/>
                 </td>
             </tr>
             <tr>

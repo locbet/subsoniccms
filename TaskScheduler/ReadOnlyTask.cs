@@ -29,7 +29,7 @@ namespace TaskScheduler
 		/// <param name="taskName">name of an existing task</param>
 		public ReadOnlyTask(string taskName)
 		{
-			ScheduledTasks st = new ScheduledTasks();
+			ScheduledTaskController st = new ScheduledTaskController();
 			Task t = st.OpenTask(taskName);
 			Load(t);
 		}
@@ -41,7 +41,7 @@ namespace TaskScheduler
 		/// <param name="computerName">name of the computer that contains the task</param>
 		public ReadOnlyTask(string taskName, string computerName)
 		{
-			ScheduledTasks st = new ScheduledTasks(computerName);
+			ScheduledTaskController st = new ScheduledTaskController(computerName);
 			Task t = st.OpenTask(taskName);
 			Load(t);
 		}
@@ -53,6 +53,24 @@ namespace TaskScheduler
 		public ReadOnlyTask(Task t)
 		{
 			Load(t);
+		}
+
+		/// <summary>
+		/// Deletes the current task from the operating system of the local computer.
+		/// </summary>
+		public bool Delete()
+		{
+			return Delete(null);
+		}
+
+		/// <summary>
+		/// Deletes the current task from the operating system of computerName.
+		/// </summary>
+		/// <param name="computerName">name of the computer to delete the task from</param>
+		public bool Delete(string computerName)
+		{
+			ScheduledTaskController stc = new ScheduledTaskController(computerName);
+			return stc.DeleteTask(this.Name);
 		}
 
 		private void Load(Task t)
@@ -87,6 +105,36 @@ namespace TaskScheduler
 			t.Close();
 		}
 
+		private Task OpenTask(string computerName, bool createIfNotExists)
+		{
+			ScheduledTaskController st;
+			if (computerName == null)
+				st = new ScheduledTaskController();
+			else
+				st = new ScheduledTaskController(computerName);
+
+			Task t = st.LoadTask(this.Name, createIfNotExists);
+
+			return t;
+		}
+
+		/// <summary>
+		/// Creates or loads the actual task and runs it
+		/// </summary>
+		public void Run()
+		{
+			Run(null);
+		}
+
+		/// <summary>
+		/// Creates or loads the actual task and runs it
+		/// </summary>
+		public void Run(string computerName)
+		{
+			Task t = OpenTask(computerName, false);
+			t.Run();
+		}
+		
 		/// <summary>
 		/// Creates a task from this read-only task instance
 		/// </summary>
@@ -101,26 +149,7 @@ namespace TaskScheduler
 		/// <param name="computerName">name of the computer where the task should be saved</param>
 		public void Save(string computerName)
 		{
-			ScheduledTasks st;
-			if (computerName == null)
-				st = new ScheduledTasks();
-			else
-				st = new ScheduledTasks(computerName);
-
-			Task t;
-			try 
-			{
-				t = st.CreateTask(this.Name);
-			} 
-			catch (Exception ex)
-			{
-				if (ex.Message.Contains("already exists"))
-				{
-					t = st.OpenTask(this.Name);
-				}
-				else
-					throw ex;
-			}
+			Task t = OpenTask(computerName, true);
 			t.ApplicationName = this.ApplicationName;
 			t.Parameters = this.Parameters;
 			t.Comment = this.Comment;
@@ -161,6 +190,31 @@ namespace TaskScheduler
 			}
 			t.Save();
 			t.Close();
+		}
+
+		/// <summary>
+		/// Terminates a currently running task
+		/// </summary>
+		public void Terminate()
+		{
+			Task t = OpenTask(null, false);
+			if (t.Status == TaskStatus.Running)
+			{
+				t.Terminate();
+			}
+		}
+
+		/// <summary>
+		/// Terminates a currently running task
+		/// </summary>
+		/// <param name="computerName">name of the computer where the task should be terminated</param>
+		public void Terminate(string computerName)
+		{
+			Task t = OpenTask(computerName, false);
+			if (t.Status == TaskStatus.Running)
+			{
+				t.Terminate();
+			}
 		}
 
 		#region Properties
@@ -361,6 +415,11 @@ namespace TaskScheduler
 			}
 		}
 
+		public bool IsRunning
+		{
+			get { return Status == TaskStatus.Running; }
+		}
+
 		/// <summary>
 		/// <p>Gets/sets the maximum length of time the task is permitted to run.
 		/// Setting MaxRunTime also affects the value of <see cref="Task.MaxRunTimeLimited"/>.
@@ -541,4 +600,177 @@ namespace TaskScheduler
 
 
 	}
+
+	/// <summary>
+	/// A strong typed collection of ReadOnlyTasks
+	/// </summary>
+	public class ReadOnlyTaskCollection : CollectionBase
+	{
+		/// <summary>
+		/// creates a new instance of the ScheduledTasksCollection
+		/// </summary>
+		public ReadOnlyTaskCollection() { }
+
+		/// <summary>
+		/// Filters an existing collection based on the set criteria. This is an in-memory filter
+		/// </summary>
+		/// <param name="propertyName">Name of the property to compare.</param>
+		/// <param name="items">The list of items to use for matching</param>
+		/// <returns>ScheduledTasksCollection</returns>
+		public ReadOnlyTaskCollection Filter(string propertyName, IList items)
+		{
+			return Filter(propertyName, items, propertyName, false);
+		}
+
+		/// <summary>
+		/// Filters an existing collection based on the set criteria. This is an in-memory filter
+		/// </summary>
+		/// <param name="propertyName">Name of the property to compare.</param>
+		/// <param name="items">The list of items to use for matching</param>
+		/// <param name="ignoreCase">Ignore case when matching string types</param>
+		/// <returns>ScheduledTasksCollection</returns>
+		public ReadOnlyTaskCollection Filter(string propertyName, IList items, bool ignoreCase)
+		{
+			return Filter(propertyName, items, propertyName, ignoreCase);
+		}
+
+		/// <summary>
+		/// Filters an existing collection based on the set criteria. This is an in-memory filter
+		/// </summary>
+		/// <param name="propertyName">Name of the property to compare.</param>
+		/// <param name="items">The list of items to use for matching</param>
+		/// <param name="itemsPropertyName">the name of the property to compare from the items list.</param>
+		/// <param name="ignoreCase">false to do case-sensitive comparison</param>
+		/// <returns>ScheduledTasksCollection</returns>
+		public ReadOnlyTaskCollection Filter(string propertyName, IList items, string itemsPropertyName, bool ignoreCase)
+		{
+			for (int i = this.Count - 1; i > -1; i--)
+			{
+				ReadOnlyTask o = this[i];
+				foreach (object item in items)
+				{
+					bool remove = false;
+					System.Reflection.PropertyInfo pi = o.GetType().GetProperty(propertyName);
+					System.Reflection.PropertyInfo pitem = item.GetType().GetProperty(itemsPropertyName);
+					if (pi.CanRead && pitem.CanRead)
+					{
+						object val = pi.GetValue(o, null);
+						object valItem = pitem.GetValue(item, null);
+						if (!val.Equals(valItem))
+						{
+							//case insensitve match for string types
+							if (val.GetType() != typeof(String) || (val.GetType() == typeof(String) && String.Compare(val.ToString(), valItem.ToString(), ignoreCase) != 0))
+								remove = true;
+						}
+					}
+					if (remove)
+					{
+						this.Remove(o);
+						break;
+					}
+				}
+			}
+			return this;
+		}
+
+
+		/// <summary>
+		/// Loads a collection of ReadOnlyTasks
+		/// </summary>
+		/// <returns></returns>
+		public ReadOnlyTaskCollection Load()
+		{
+			ScheduledTaskController st = new ScheduledTaskController();
+			string[] taskNames = st.GetTaskNames();
+			// Open each task, dump info to console
+			foreach (string name in taskNames)
+			{
+				try
+				{
+					Task t = st.OpenTask(name);
+					//Console.WriteLine("--> " + name + " ");
+					List.Add(new ReadOnlyTask(t));
+					//t.Close();
+				}
+				catch (Exception ex)
+				{
+					if (!ex.Message.Contains("unknown user name or bad password"))
+						throw ex;
+				}
+			}
+			return this;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public int Add(ReadOnlyTask item)
+		{
+			return List.Add(item);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="item"></param>
+		public void Insert(int index, ReadOnlyTask item)
+		{
+			List.Insert(index, item);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		public void Remove(ReadOnlyTask item)
+		{
+			List.Remove(item);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public bool Contains(ReadOnlyTask item)
+		{
+			return List.Contains(item);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public int IndexOf(ReadOnlyTask item)
+		{
+			return List.IndexOf(item);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="array"></param>
+		/// <param name="index"></param>
+		public void CopyTo(ReadOnlyTask[] array, int index)
+		{
+			List.CopyTo(array, index);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		public ReadOnlyTask this[int index]
+		{
+			get { return (ReadOnlyTask)List[index]; }
+			set { List[index] = value; }
+		}
+
+	}
+
 }
