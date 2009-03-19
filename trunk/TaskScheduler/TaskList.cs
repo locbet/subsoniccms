@@ -12,7 +12,7 @@ namespace TaskScheduler
 	/// <p>A TaskList is indexed by name rather than position.
 	/// You can't add, remove, or assign tasks in TaskList.  Accessing
 	/// a Task in the list by indexing, or by enumeration, is equivalent to opening a task
-	/// by calling the ScheduledTasks Open() method.</p> 	
+	/// by calling the ScheduledTaskController Open() method.</p> 	
 	/// <p><i>Provided for compatibility with version one of the library.  Use of Scheduler
 	/// and TaskList will normally result in COM memory leaks.</i></p>
 	/// </remarks>
@@ -21,7 +21,7 @@ namespace TaskScheduler
 		/// <summary>
 		/// Scheduled Tasks folder supporting this TaskList.
 		/// </summary>
-		private ScheduledTasks st = null;
+		private ScheduledTaskController m_stc = null;
 
 		/// <summary>
 		/// Name of the target computer whose Scheduled Tasks are to be accessed.
@@ -33,11 +33,11 @@ namespace TaskScheduler
 		/// </summary>
 		internal TaskList()
 		{
-			st = new ScheduledTasks();
+			m_stc = new ScheduledTaskController();
 		}
 
 		internal TaskList(string computer) {
-			st = new ScheduledTasks(computer);
+			m_stc = new ScheduledTaskController(computer);
 		}
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace TaskScheduler
 		/// </summary>
 		private class Enumerator : IEnumerator
 		{
-			private ScheduledTasks outer;
+			private ScheduledTaskController outer;
 			private string[] nameTask;
 			private int curIndex;
 			private Task curTask;
@@ -53,8 +53,8 @@ namespace TaskScheduler
 			/// <summary>
 			/// Internal constructor - Only accessable through <see cref="IEnumerable.GetEnumerator()"/>
 			/// </summary>
-			/// <param name="st">ScheduledTasks object</param>
-			internal Enumerator(ScheduledTasks st)
+			/// <param name="st">ScheduledTaskController object</param>
+			internal Enumerator(ScheduledTaskController st)
 			{
 				outer = st;
 				nameTask = st.GetTaskNames();
@@ -104,8 +104,8 @@ namespace TaskScheduler
 			}
 			set
 			{
-				st.Dispose();
-				st = new ScheduledTasks(value);
+				m_stc.Dispose();
+				m_stc = new ScheduledTaskController(value);
 				nameComputer = value;
 			}
 		}
@@ -118,7 +118,7 @@ namespace TaskScheduler
 		/// <exception cref="ArgumentException">There is already a task of the same name as the one supplied for the new task.</exception>
 		public Task NewTask(string name)
 		{
-			return st.CreateTask(name);
+			return m_stc.CreateTask(name);
 		}
 
 		/// <summary>
@@ -127,7 +127,7 @@ namespace TaskScheduler
 		/// <param name="name">Name of task to delete</param>
 		public void Delete(string name)
 		{
-			st.DeleteTask(name);
+			m_stc.DeleteTask(name);
 		}
 
 		/// <summary>
@@ -138,7 +138,7 @@ namespace TaskScheduler
 		{
 			get
 			{
-				return st.OpenTask(name);
+				return m_stc.OpenTask(name);
 			}
 		}
 
@@ -149,7 +149,7 @@ namespace TaskScheduler
 		/// <returns>Enumerator for TaskList</returns>
 		public System.Collections.IEnumerator GetEnumerator()
 		{
-			return new Enumerator(st);
+			return new Enumerator(m_stc);
 		}
 			#endregion
 
@@ -159,7 +159,7 @@ namespace TaskScheduler
 		/// </summary>
 		public void Dispose()
 		{
-			st.Dispose();
+			m_stc.Dispose();
 		}
 			#endregion
 

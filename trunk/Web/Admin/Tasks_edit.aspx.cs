@@ -35,17 +35,25 @@ public partial class admin_task_edit : BasePage
 
         if (!IsPostBack)
         {
-			LoadDaysOfWeek();
-			ToggleTriggers(isEditMode);
-			// Is it in edit mode?
-			if (isEditMode)
+			try
 			{
-				LoadAll();
+				LoadDaysOfWeek();
+				ToggleTriggers(isEditMode);
+				ToggleEdit(isEditMode);
+				// Is it in edit mode?
+				if (isEditMode)
+				{
+					LoadAll();
+				}
+				else
+				{
+					LoadFlags(null);
+					LoadApps(null);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				LoadFlags(null);
-				LoadApps(null);
+				OnPageError("Unable to completely load this page.", ex);
 			}
         }
     }
@@ -143,7 +151,7 @@ public partial class admin_task_edit : BasePage
                     //we'll use it to loop through the current triggers
                     ReadOnlyTask rt = new ReadOnlyTask(taskName);
                     
-                    ScheduledTasks st = new ScheduledTasks();
+                    ScheduledTaskController st = new ScheduledTaskController();
                     Task t = st.OpenTask(taskName);
                     foreach (Trigger tr in t.Triggers)
                     {
@@ -162,6 +170,28 @@ public partial class admin_task_edit : BasePage
 		}
 	}
 
+	public void DeleteClick(object sender, EventArgs e)
+	{
+		try
+		{
+			DeleteTask(sender, e);
+			SiteUtility.Redirect("~/admin/tasks.aspx");
+		}
+		catch (Exception ex)
+		{
+			OnPageError("Unable to delete task", ex);
+		}
+	}
+
+	private void DeleteTask(object sender, EventArgs e)
+	{
+		if (!isEditMode)
+		{
+			throw new InvalidOperationException("Can't delete a task that hasn't been saved yet.");
+		}
+		CMS.TaskService.DeleteTask(taskName);
+	}
+
 	public void SaveClick(object sender, EventArgs e)
     {
 		try
@@ -175,7 +205,25 @@ public partial class admin_task_edit : BasePage
 		}
     }
 
+	public void SaveAndRunClick(object sender, EventArgs e)
+	{
+		try
+		{
+			SaveTask(sender, e, true);
+			SiteUtility.Redirect("~/admin/tasks_edit.aspx?taskname=" + Server.UrlPathEncode(taskName));
+		}
+		catch (Exception ex)
+		{
+			OnPageError("Unable to save task", ex);
+		}
+	}
+
 	private void SaveTask(object sender, EventArgs e)
+	{
+		SaveTask(sender, e, false);
+	}
+
+	private void SaveTask(object sender, EventArgs e, bool executeAfterSave)
 	{
 		if (!Page.IsValid)
 		{
@@ -223,6 +271,11 @@ public partial class admin_task_edit : BasePage
 		}
 
 		rot.Save();
+
+		if (executeAfterSave)
+		{
+			rot.Run();
+		}
 	}
 
     public void SaveTrigger(ReadOnlyTask rot)
@@ -285,4 +338,9 @@ public partial class admin_task_edit : BasePage
 		trTriggerList.Visible = showIt;
 	}
 
+	private void ToggleEdit(bool enableIt)
+	{
+		DeleteButton.Enabled = enableIt;
+		txtTaskName.Enabled = !enableIt;
+	}
 }
