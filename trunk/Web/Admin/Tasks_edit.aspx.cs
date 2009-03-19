@@ -287,6 +287,7 @@ public partial class admin_task_edit : BasePage
 			int duration = 0;
             int repeatHours = 0;
             int repeatMinutes = 0;
+			int intervalMinutes = 0;
 
             switch (ddlTriggerType.SelectedValue)
             {
@@ -311,23 +312,23 @@ public partial class admin_task_edit : BasePage
 						if (li.Selected)
 							dow = dow | (DaysOfTheWeek)Enum.Parse(typeof(DaysOfTheWeek), li.Text);
 					}
-					duration = ((int)SubSonic.Sugar.Dates.DiffDays(endDate, startDate) % 7); 
+					duration = (((int)SubSonic.Sugar.Dates.DiffDays(endDate, startDate) % 7)); 
+					duration = (duration > 1 ? duration : 1);
 					WeeklyTrigger wt = new WeeklyTrigger((short)startDate.Hour, (short)startDate.Minute, dow, (short)(duration));
 					wt.BeginDate = startDate;
-					duration = ((int)SubSonic.Sugar.Dates.DiffHours(endDate, startDate) % 24);
-					wt.DurationMinutes = (duration < 0 ? 0 : duration);
 					if (Int32.TryParse(txtRepeatHour.Text, out repeatHours) && Int32.TryParse(txtRepeatMinute.Text, out repeatMinutes))
-						wt.IntervalMinutes = (repeatHours * 60) + repeatMinutes;
+						intervalMinutes = (repeatHours * 60) + repeatMinutes;
 					else
-						wt.IntervalMinutes = 0;
+						intervalMinutes = 0;
+					duration = ((int)SubSonic.Sugar.Dates.DiffMinutes(endDate, startDate));
+					wt.DurationMinutes = (duration > intervalMinutes ? (duration > 1440 ? 1440 : duration) : intervalMinutes);
+					wt.IntervalMinutes = intervalMinutes;
 					if (cbRepeatUntilIsEndDate.Checked)
 						wt.EndDate = endDate;
 					rot.Triggers.Add(wt);
 					//rot.NextRunTime = (wt.BeginDate > DateTime.Now ? wt.BeginDate : DateTime.Now);
 					break;
 			}
-            LoadTriggers(new ReadOnlyTask(taskName));
-            LoadAll();
         }
     }
 
