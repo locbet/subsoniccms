@@ -694,7 +694,7 @@ namespace TaskScheduler
 				}
 				catch (Exception ex)
 				{
-					if (!ex.Message.Contains("unknown user name or bad password"))
+					if (!ex.Message.Contains("unknown user name or bad password") && !ex.Message.Contains("E_ACCESSDENIED"))
 						throw ex;
 				}
 			}
